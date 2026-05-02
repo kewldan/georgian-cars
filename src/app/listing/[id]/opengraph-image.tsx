@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { FX, LISTINGS } from "@/lib/data";
-import { ASH, INK, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, SLATE, Wordmark } from "@/lib/og";
-import { PRICE_BAR_GRADIENT, type PriceRating, RATING_META } from "@/lib/rating";
+import { ASH, INK, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, SLATE } from "@/lib/og";
+import { type PriceRating, RATING_META } from "@/lib/rating";
 import { fmt } from "@/lib/utils";
 
 export const alt = "GeorgianCars listing";
@@ -36,14 +36,11 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             flexDirection: "column",
           }}
         >
-          <Mark size={180} />
-          <div style={{ display: "flex", marginTop: 32 }}>
-            <Wordmark size={72} />
-          </div>
+          <Mark size={200} />
           <div
             style={{
               display: "flex",
-              marginTop: 20,
+              marginTop: 28,
               fontSize: 28,
               color: ASH,
             }}
@@ -75,22 +72,22 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             flexDirection: "column",
             flex: 1,
             minWidth: 0,
+            overflow: "hidden",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <Mark size={68} />
-            <Wordmark size={36} />
-          </div>
+          <Mark size={64} />
 
           <div
             style={{
               display: "flex",
-              marginTop: 36,
-              fontSize: 80,
+              marginTop: 32,
+              fontSize: 64,
               fontWeight: 800,
               color: PAPER,
               letterSpacing: "-0.04em",
               lineHeight: 1,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
             }}
           >
             {listing.make} {listing.model}
@@ -136,80 +133,35 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: 14,
+              alignItems: "baseline",
+              gap: 20,
               paddingTop: 28,
               borderTop: `2px solid ${SLATE}`,
             }}
           >
-            <div style={{ display: "flex", alignItems: "baseline", gap: 20 }}>
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: 88,
-                  fontWeight: 800,
-                  color: PAPER,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1,
-                }}
-              >
-                {fmt.price(listing.price, "USD", FX)}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  fontFamily: "monospace",
-                  fontSize: 16,
-                  fontWeight: 700,
-                  letterSpacing: "0.18em",
-                  color: rating.color,
-                }}
-              >
-                {ratingLabelText}
-              </div>
-            </div>
-
             <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: 14,
-                marginTop: 4,
+                fontSize: 80,
+                fontWeight: 800,
+                color: PAPER,
+                letterSpacing: "-0.04em",
+                lineHeight: 1,
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  flex: 1,
-                  height: 8,
-                  borderRadius: 4,
-                  background: PRICE_BAR_GRADIENT,
-                  position: "relative",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    position: "absolute",
-                    top: -3,
-                    left: `${rating.pct}%`,
-                    width: 4,
-                    height: 14,
-                    background: PAPER,
-                    borderRadius: 2,
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  fontFamily: "monospace",
-                  fontSize: 16,
-                  color: ASH,
-                }}
-              >
-                fair {fmt.price(Math.round(listing.fairPrice), "USD", FX)}
-              </div>
+              {fmt.price(listing.price, "USD", FX)}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                fontFamily: "monospace",
+                fontSize: 16,
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                color: rating.color,
+              }}
+            >
+              {ratingLabelText}
             </div>
           </div>
         </div>
@@ -252,7 +204,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                 borderRadius: 4,
               }}
             >
-              VIN ✓
+              VIN OK
             </div>
           ) : null}
         </div>

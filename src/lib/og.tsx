@@ -13,8 +13,8 @@ export const OG_CONTENT_TYPE = "image/png";
 export function Mark({ size = 120 }: { size?: number }) {
   const w = (size * 36) / 48;
   return (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: rendered inside ImageResponse where Satori draws <title> as visible text
     <svg width={w} height={size} viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
-      <title>GeorgianCars</title>
       <path d="M18 0 C28 0 36 8 36 18 C36 30 18 48 18 48 C18 48 0 30 0 18 C0 8 8 0 18 0 Z" fill={LIME} />
       <circle cx="18" cy="18" r="13" fill={INK} />
       <path d="M28 8 L8 18 L16 21 L18 28 L28 8 Z" fill={LIME} />
@@ -26,6 +26,7 @@ export function Mark({ size = 120 }: { size?: number }) {
 export function CornerBrackets() {
   const stroke = LIME;
   return (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: rendered inside ImageResponse where Satori draws <title> as visible text
     <svg
       width="1200"
       height="630"
@@ -33,7 +34,6 @@ export function CornerBrackets() {
       xmlns="http://www.w3.org/2000/svg"
       style={{ position: "absolute", top: 0, left: 0 }}
     >
-      <title>frame</title>
       <g stroke={stroke} strokeWidth="2" fill="none">
         <path d="M50 50 L50 90 M50 50 L90 50" />
         <path d="M1150 50 L1150 90 M1150 50 L1110 50" />

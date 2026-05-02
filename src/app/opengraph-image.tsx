@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { ASH, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, Wordmark } from "@/lib/og";
+import { LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER } from "@/lib/og";
 
 export const alt = "GeorgianCars";
 export const size = OG_SIZE;
@@ -17,26 +17,11 @@ export default async function Image() {
           alignItems: "center",
         }}
       >
-        <Mark size={220} />
-        <div style={{ display: "flex", marginTop: 40 }}>
-          <Wordmark size={104} />
-        </div>
+        <Mark size={260} />
         <div
           style={{
             display: "flex",
-            marginTop: 24,
-            fontSize: 26,
-            fontWeight: 500,
-            color: ASH,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          Авто из Telegram-каналов Грузии · нормализовано ИИ
-        </div>
-        <div
-          style={{
-            display: "flex",
-            marginTop: 36,
+            marginTop: 48,
             gap: 18,
             fontFamily: "monospace",
             fontSize: 18,

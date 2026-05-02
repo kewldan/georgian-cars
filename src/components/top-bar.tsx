@@ -1,10 +1,22 @@
 "use client";
+import * as Dialog from "@radix-ui/react-dialog";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Bookmark, ChevronDown, Heart, List as ListIcon, type LucideIcon, MapPinned, Moon, Sun } from "lucide-react";
+import {
+  Bookmark,
+  ChevronDown,
+  Heart,
+  List as ListIcon,
+  type LucideIcon,
+  MapPinned,
+  Menu,
+  Moon,
+  Sun,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { setLocale as setLocaleAction } from "@/app/actions";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
@@ -54,6 +66,8 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-50 flex min-h-[53px] items-center gap-3 border-b border-border bg-background px-4">
+      <BurgerMenu navItems={navItems} pathname={pathname} />
+
       <Link
         href="/"
         aria-label={t("appName")}
@@ -65,7 +79,7 @@ export function TopBar() {
         </span>
       </Link>
 
-      <nav className="flex flex-1 items-center gap-1 min-w-0 overflow-hidden">
+      <nav className="hidden flex-1 items-center gap-1 min-w-0 overflow-hidden md:flex">
         {navItems.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
@@ -81,7 +95,7 @@ export function TopBar() {
               )}
             >
               <Icon className="h-3.5 w-3.5" strokeWidth={2} />
-              <span className="hidden md:inline">{item.label}</span>
+              <span>{item.label}</span>
               {item.badge ? (
                 <span className="font-mono text-[10px] font-bold rounded-full bg-accent text-accent-foreground px-1.5">
                   {item.badge}
@@ -92,7 +106,7 @@ export function TopBar() {
         })}
       </nav>
 
-      <div className="flex items-center gap-1.5 shrink-0">
+      <div className="ml-auto flex items-center gap-1.5 shrink-0 md:ml-0">
         <LanguageSwitch locale={locale} disabled={isPending} onSelect={onSelectLocale} />
         <div className="hidden sm:inline-flex">
           <CurrencySwitch currency={currency} onSelect={(c) => setCurrency(c)} />
@@ -107,6 +121,89 @@ export function TopBar() {
         </Button>
       </div>
     </header>
+  );
+}
+
+function BurgerMenu({
+  navItems,
+  pathname,
+}: {
+  navItems: Array<{ href: string; label: string; icon: LucideIcon; badge?: number }>;
+  pathname: string;
+}) {
+  const t = useTranslations();
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger asChild>
+        <button
+          type="button"
+          aria-label="Menu"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors md:hidden"
+        >
+          <Menu className="h-4 w-4" />
+        </button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0" />
+        <Dialog.Content
+          className={cn(
+            "fixed inset-y-0 left-0 z-[60] flex w-full max-w-[280px] flex-col border-r border-border bg-card shadow-2xl",
+            "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left"
+          )}
+        >
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <Dialog.Title asChild>
+              <span className="flex items-center gap-2.5 font-extrabold text-base tracking-tight">
+                <Mark size={24} />
+                <span>
+                  Georgian<span className="text-accent">Cars</span>
+                </span>
+              </span>
+            </Dialog.Title>
+            <Dialog.Close asChild>
+              <button
+                type="button"
+                aria-label="Close"
+                className="grid h-7 w-7 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </Dialog.Close>
+          </div>
+          <nav className="flex flex-col gap-1 p-2">
+            {navItems.map((item) => {
+              const active = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Dialog.Close asChild key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "inline-flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors",
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={2} />
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge ? (
+                      <span className="font-mono text-[10px] font-bold rounded-full bg-accent text-accent-foreground px-1.5 py-0.5">
+                        {item.badge}
+                      </span>
+                    ) : null}
+                  </Link>
+                </Dialog.Close>
+              );
+            })}
+          </nav>
+          <div className="mt-auto border-t border-border px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+            {t("appName")}
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
