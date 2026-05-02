@@ -11,6 +11,7 @@ RUN bun install --locked
 ENV NODE_ENV=production
 
 COPY next.config.ts postcss.config.mjs tsconfig.json ./
+COPY ./messages ./messages
 COPY ./src ./src
 
 RUN bun run build
