@@ -74,7 +74,7 @@ export function TopBar() {
         className="flex items-center gap-2.5 font-extrabold text-base tracking-tight shrink-0"
       >
         <Mark size={28} />
-        <span className="hidden sm:inline">
+        <span>
           Georgian<span className="text-accent">Cars</span>
         </span>
       </Link>
