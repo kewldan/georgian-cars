@@ -28,10 +28,23 @@ import { cn } from "@/lib/utils";
 type Currency = "USD" | "RUB";
 
 const LOCALE_OPTIONS: Array<{ code: Locale; flag: string; label: string }> = [
-  { code: "ru", flag: "🇷🇺", label: "Русский" },
-  { code: "en", flag: "🇬🇧", label: "English" },
-  { code: "ka", flag: "🇬🇪", label: "ქართული" },
+  { code: "ru", flag: "ru", label: "Русский" },
+  { code: "en", flag: "gb", label: "English" },
+  { code: "ka", flag: "ge", label: "ქართული" },
 ];
+
+function Flag({ code, className }: { code: string; className?: string }) {
+  return (
+    <img
+      src={`https://flagcdn.com/${code}.svg`}
+      alt=""
+      aria-hidden="true"
+      className={className}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
 
 const CURRENCY_OPTIONS: Array<{ code: Currency; symbol: string; label: string }> = [
   { code: "USD", symbol: "$", label: "US Dollar" },
@@ -226,7 +239,7 @@ function LanguageSwitch({
           aria-label={current.label}
           className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 transition-colors"
         >
-          <span className="text-sm leading-none">{current.flag}</span>
+          <Flag code={current.flag} className="h-3 w-[18px] rounded-[1px] object-cover" />
           <span className="hidden sm:inline">{current.code}</span>
           <ChevronDown className="h-3 w-3 opacity-60" />
         </button>
@@ -246,7 +259,7 @@ function LanguageSwitch({
                 opt.code === locale && "bg-secondary font-semibold"
               )}
             >
-              <span className="text-base leading-none">{opt.flag}</span>
+              <Flag code={opt.flag} className="h-3.5 w-[21px] rounded-[1px] object-cover" />
               <span className="flex-1">{opt.label}</span>
               <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{opt.code}</span>
             </DropdownMenu.Item>
