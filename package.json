@@ -28,6 +28,8 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.6.0",
+    "embla-carousel-wheel-gestures": "^8.1.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",

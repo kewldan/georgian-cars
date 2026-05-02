@@ -1,12 +1,21 @@
 "use client";
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { Heart, MessageSquare, Phone, Send } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ListingCard } from "@/components/listing-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Carousel,
+  type CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import type { Listing } from "@/lib/data";
 import { FX, LISTINGS } from "@/lib/data";
 import { ratingLabel as getRatingLabel, PRICE_BAR_GRADIENT, RATING_META } from "@/lib/rating";
@@ -24,8 +33,21 @@ function Spec({ k, v }: { k: string; v: string | number }) {
 
 export function DetailView({ listing }: { listing: Listing }) {
   const t = useTranslations();
+  const [api, setApi] = useState<CarouselApi>();
   const [photo, setPhoto] = useState(0);
   const { favorites, toggleFav, currency } = useApp();
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setPhoto(api.selectedScrollSnap());
+    onSelect();
+    api.on("select", onSelect);
+    api.on("reInit", onSelect);
+    return () => {
+      api.off("select", onSelect);
+      api.off("reInit", onSelect);
+    };
+  }, [api]);
   const isFav = favorites.includes(listing.id);
   const meta = RATING_META[listing.priceRating];
   const ratingLabel = getRatingLabel(t, listing.priceRating);
@@ -51,16 +73,26 @@ export function DetailView({ listing }: { listing: Listing }) {
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <div>
           <Card className="overflow-hidden">
-            <div className="aspect-video bg-muted">
-              {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
-              <img src={listing.photos[photo]} alt="" className="h-full w-full object-cover" />
-            </div>
+            <Carousel setApi={setApi} opts={{ loop: true }} plugins={[WheelGesturesPlugin()]} className="bg-muted">
+              <CarouselContent className="ml-0">
+                {listing.photos.map((p) => (
+                  <CarouselItem key={p} className="pl-0">
+                    <div className="aspect-video">
+                      {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
+                      <img src={p} alt="" draggable={false} className="h-full w-full object-cover select-none" />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-3" />
+              <CarouselNext className="right-3" />
+            </Carousel>
             <div className="flex gap-1.5 overflow-x-auto bg-secondary p-1.5">
               {listing.photos.map((p, i) => (
                 <button
                   key={p}
                   type="button"
-                  onClick={() => setPhoto(i)}
+                  onClick={() => api?.scrollTo(i)}
                   className={cn(
                     "h-[60px] w-20 shrink-0 overflow-hidden rounded-sm border-2",
                     i === photo ? "border-foreground" : "border-transparent"
