@@ -36,7 +36,7 @@ const LOCALE_OPTIONS: Array<{ code: Locale; flag: string; label: string }> = [
 function Flag({ code, className }: { code: string; className?: string }) {
   return (
     <img
-      src={`https://flagcdn.com/${code}.svg`}
+      src={`https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/${code}.svg`}
       alt=""
       aria-hidden="true"
       className={className}
