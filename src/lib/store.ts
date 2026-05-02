@@ -27,12 +27,6 @@ export type FilterState = {
 };
 
 type AppState = {
-  filters: FilterState;
-  setFilters: (f: FilterState) => void;
-  search: string;
-  setSearch: (s: string) => void;
-  sort: string;
-  setSort: (s: string) => void;
   favorites: string[];
   toggleFav: (id: string) => void;
   currency: "USD" | "RUB";
@@ -46,12 +40,6 @@ type AppState = {
 export const useApp = create<AppState>()(
   persist(
     (set) => ({
-      filters: {},
-      setFilters: (f) => set({ filters: f }),
-      search: "",
-      setSearch: (s) => set({ search: s }),
-      sort: "newest",
-      setSort: (s) => set({ sort: s }),
       favorites: [],
       toggleFav: (id) =>
         set((st) => ({

@@ -30,10 +30,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-screen bg-secondary">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-lg"
+        >
+          Skip to content
+        </a>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <TopBar />
-            {children}
+            <main id="main">{children}</main>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

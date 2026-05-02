@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BODIES, CITIES, COLORS, DRIVES, FUELS, MAKES, TG_CHANNELS, TRANSMISSIONS } from "@/lib/data";
-import { type FilterState, useApp } from "@/lib/store";
+import { useListingsParams } from "@/lib/listings-params";
+import type { FilterState } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 function FilterGroup({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
@@ -89,7 +90,7 @@ function Range({
 
 function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
   const t = useTranslations();
-  const { filters, setFilters } = useApp();
+  const { filters, setFilters } = useListingsParams();
   const f = filters;
   const upd = (patch: Partial<FilterState>) => setFilters({ ...f, ...patch });
 
@@ -259,7 +260,10 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
 
 export function FiltersPanel() {
   return (
-    <aside className="sticky top-[53px] hidden h-[calc(100vh-53px)] w-[280px] shrink-0 border-r border-border bg-card lg:block">
+    <aside
+      aria-label="Filters"
+      className="sticky top-[53px] hidden h-[calc(100dvh-53px)] w-[280px] shrink-0 border-r border-border bg-card lg:block"
+    >
       <ScrollArea className="h-full">
         <FiltersBody />
       </ScrollArea>
@@ -269,7 +273,7 @@ export function FiltersPanel() {
 
 export function MobileFiltersButton() {
   const t = useTranslations();
-  const { filters, setFilters } = useApp();
+  const { filters, setFilters } = useListingsParams();
   const [open, setOpen] = useState(false);
   const activeCount = countActiveFilters(filters);
   return (

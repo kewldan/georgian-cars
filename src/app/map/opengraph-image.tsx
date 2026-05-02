@@ -1,11 +1,13 @@
 import { ImageResponse } from "next/og";
 import { ASH, INK, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, Wordmark } from "@/lib/og";
+import { loadOgFonts } from "@/lib/og-fonts";
 
 export const alt = "GeorgianCars — Map";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
 export default async function Image() {
+  const fonts = await loadOgFonts();
   return new ImageResponse(
     <OGShell topLabel="GEORGIANCARS · MAP" pageNumber="GEORGIA · 8 CITIES">
       <div
@@ -87,6 +89,6 @@ export default async function Image() {
         </div>
       </div>
     </OGShell>,
-    { ...size }
+    { ...size, fonts }
   );
 }

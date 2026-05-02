@@ -60,7 +60,7 @@ export function MapView() {
   const inCity = LISTINGS.filter((l) => l.city === selected).slice(0, 6);
 
   return (
-    <div className="grid h-[calc(100vh-53px)] grid-cols-1 md:grid-cols-[320px_1fr]">
+    <div className="grid h-[calc(100dvh-53px)] grid-cols-1 md:grid-cols-[320px_1fr]">
       <aside className="overflow-y-auto border-r border-border bg-card">
         <div className="border-b border-border px-4 py-3.5">
           <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">

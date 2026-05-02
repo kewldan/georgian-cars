@@ -75,7 +75,7 @@ export function MonoLabel({ children, color = ASH }: { children: ReactNode; colo
     <div
       style={{
         display: "flex",
-        fontFamily: "monospace",
+        fontFamily: "JetBrainsMono, monospace",
         fontSize: 18,
         letterSpacing: "0.22em",
         fontWeight: 700,
@@ -109,7 +109,7 @@ export function OGShell({
         display: "flex",
         flexDirection: "column",
         padding: 80,
-        fontFamily: "sans-serif",
+        fontFamily: "Manrope, sans-serif",
         position: "relative",
       }}
     >

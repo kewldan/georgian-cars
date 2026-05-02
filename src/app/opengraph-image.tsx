@@ -1,11 +1,13 @@
 import { ImageResponse } from "next/og";
 import { LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER } from "@/lib/og";
+import { loadOgFonts } from "@/lib/og-fonts";
 
 export const alt = "GeorgianCars";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
 export default async function Image() {
+  const fonts = await loadOgFonts();
   return new ImageResponse(
     <OGShell topLabel="GEORGIANCARS · BRAND" pageNumber="LOGO · BOOK · 2025">
       <div
@@ -38,6 +40,6 @@ export default async function Image() {
         </div>
       </div>
     </OGShell>,
-    { ...size }
+    { ...size, fonts }
   );
 }

@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { FX, LISTINGS } from "@/lib/data";
 import { ASH, INK, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, SLATE } from "@/lib/og";
+import { loadOgFonts } from "@/lib/og-fonts";
 import { type PriceRating, RATING_META } from "@/lib/rating";
 import { fmt } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ function formatKmCompact(n: number) {
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const listing = LISTINGS.find((l) => l.id === id);
+  const fonts = await loadOgFonts();
 
   if (!listing) {
     return new ImageResponse(
@@ -49,7 +51,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           </div>
         </div>
       </OGShell>,
-      { ...size }
+      { ...size, fonts }
     );
   }
 
@@ -210,6 +212,6 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         </div>
       </div>
     </OGShell>,
-    { ...size }
+    { ...size, fonts }
   );
 }
