@@ -60,7 +60,7 @@ export function TopBar() {
         className="flex items-center gap-2.5 font-extrabold text-base tracking-tight shrink-0"
       >
         <Mark size={28} />
-        <span>
+        <span className="hidden sm:inline">
           Georgian<span className="text-accent">Cars</span>
         </span>
       </Link>
@@ -94,7 +94,9 @@ export function TopBar() {
 
       <div className="flex items-center gap-1.5 shrink-0">
         <LanguageSwitch locale={locale} disabled={isPending} onSelect={onSelectLocale} />
-        <CurrencySwitch currency={currency} onSelect={(c) => setCurrency(c)} />
+        <div className="hidden sm:inline-flex">
+          <CurrencySwitch currency={currency} onSelect={(c) => setCurrency(c)} />
+        </div>
         <Button
           variant="outline"
           size="icon"

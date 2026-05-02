@@ -1,6 +1,7 @@
 "use client";
 import { Grid, List as ListIcon, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { MobileFiltersButton } from "@/components/filters-panel";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -17,7 +18,7 @@ export function ListingsToolbar({ count }: { count: number }) {
         </span>
         <span className="text-[13px] text-muted-foreground">{t("search.results")}</span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <div className="relative w-64 hidden md:block">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -27,8 +28,9 @@ export function ListingsToolbar({ count }: { count: number }) {
             className="pl-8"
           />
         </div>
+        <MobileFiltersButton />
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[170px] sm:w-[200px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
