@@ -1,0 +1,18 @@
+FROM node:lts
+WORKDIR /usr/app
+
+ENV TZ="Europe/Moscow"
+
+RUN npm install -g bun
+
+COPY package.json bun.lock ./
+RUN bun install --locked
+
+ENV NODE_ENV=production
+
+COPY next.config.ts postcss.config.mjs tsconfig.json ./
+COPY ./src ./src
+
+RUN bun run build
+
+CMD ["bun", "run", "start"]

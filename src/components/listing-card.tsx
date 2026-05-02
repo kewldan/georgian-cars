@@ -1,0 +1,96 @@
+"use client";
+import { Heart, ImageIcon, MapPin } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Badge } from "@/components/ui/badge";
+import type { Listing } from "@/lib/data";
+import { FX } from "@/lib/data";
+import { ratingLabel as getRatingLabel } from "@/lib/rating";
+import { useApp } from "@/lib/store";
+import { cn, fmt } from "@/lib/utils";
+
+function ago(d: number, h: number, t: ReturnType<typeof useTranslations>) {
+  if (d > 0) return t("card.ago_d", { n: d });
+  if (h > 0) return t("card.ago_h", { n: h });
+  return t("card.ago_now");
+}
+
+export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; viewMode?: "grid" | "list" }) {
+  const t = useTranslations();
+  const { favorites, toggleFav, currency } = useApp();
+  const isFav = favorites.includes(listing.id);
+  const isList = viewMode === "list";
+
+  const ratingLabel = getRatingLabel(t, listing.priceRating);
+
+  return (
+    <Link
+      href={`/listing/${listing.id}`}
+      className={cn(
+        "group flex overflow-hidden rounded-md border border-border bg-card transition-all hover:shadow-md hover:border-foreground/40",
+        isList ? "flex-row min-h-[160px]" : "flex-col"
+      )}
+    >
+      <div className={cn("relative overflow-hidden bg-muted", isList ? "w-72 shrink-0" : "aspect-[16/10]")}>
+        {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
+        <img src={listing.photos[0]} alt={`${listing.make} ${listing.model}`} className="h-full w-full object-cover" />
+        <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+          <Badge variant={listing.priceRating}>{ratingLabel}</Badge>
+          {listing.vinChecked && <Badge variant="default">VIN ✓</Badge>}
+          {listing.postedDays === 0 && <Badge variant="new">NEW</Badge>}
+        </div>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleFav(listing.id);
+          }}
+          className={cn(
+            "absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full border backdrop-blur",
+            isFav ? "bg-accent text-accent-foreground border-accent" : "bg-white/90 text-neutral-900 border-black/5"
+          )}
+          aria-label="favorite"
+        >
+          <Heart className={cn("h-3.5 w-3.5", isFav && "fill-current")} />
+        </button>
+        <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold font-mono text-white">
+          <ImageIcon className="h-2.5 w-2.5" /> {listing.photos.length}
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-1.5 p-3.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-[15px] font-bold leading-tight tracking-tight">
+            {listing.make} {listing.model}
+          </span>
+          <span className="font-mono text-[13px] font-semibold text-muted-foreground shrink-0">{listing.year}</span>
+        </div>
+        <div className="font-mono text-xs text-muted-foreground">
+          {fmt.km(listing.mileage)} {t("card.km")}
+          <span className="mx-2 text-foreground/30">·</span>
+          {listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}
+          <span className="mx-2 text-foreground/30">·</span>
+          {listing.power} {t("card.hp")}
+          <span className="mx-2 text-foreground/30">·</span>
+          {listing.transmission.slice(0, 4)}
+          <span className="mx-2 text-foreground/30">·</span>
+          {listing.drive}
+        </div>
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1 font-semibold text-foreground/80">
+            <MapPin className="h-3 w-3" /> {listing.city}
+          </span>
+          <span className="font-mono">{ago(listing.postedDays, listing.postedHours, t)}</span>
+        </div>
+        <div className="mt-auto flex items-end justify-between border-t border-dashed border-border pt-2">
+          <span className="font-mono text-xl font-extrabold tracking-tight tabular-nums">
+            {fmt.price(listing.price, currency, FX)}
+          </span>
+          <span className="rounded-md bg-accent px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider font-mono text-accent-foreground">
+            {t("card.details")} →
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}

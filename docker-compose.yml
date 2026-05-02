@@ -1,0 +1,31 @@
+services:
+  proxy:
+    image: nginx
+    restart: unless-stopped
+    expose:
+      - 80
+    networks:
+      - backends
+      - virtual-hosts
+    depends_on:
+      - web
+    labels:
+      - traefik.http.routers.cars-ge.rule=Host(`cars.kewldan.ru`)
+      - traefik.enable=true
+      - traefik.http.services.cars-ge.loadbalancer.server.port=80
+      - traefik.http.routers.cars-ge.tls=true
+      - traefik.http.routers.cars-ge.tls.certresolver=myresolver
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d:ro
+  web:
+    build: .
+    restart: unless-stopped
+    networks:
+      - backends
+    expose:
+      - 80
+
+networks:
+  backends:
+  virtual-hosts:
+    external: true
