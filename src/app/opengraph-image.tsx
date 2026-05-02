@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { ASH, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, Wordmark } from "@/lib/og";
 
-export const alt = "GeorgianCars — авто из Telegram-каналов Грузии";
+export const alt = "GeorgianCars";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

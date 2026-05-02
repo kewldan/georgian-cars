@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BODIES, CITIES, COLORS, DRIVES, FUELS, MAKES, TG_CHANNELS, TRANSMISSIONS } from "@/lib/data";
 import { type FilterState, useApp } from "@/lib/store";
@@ -94,160 +95,168 @@ export function FiltersPanel() {
   const modelOptions = useMemo(() => (f.makes || []).flatMap((m) => MAKES[m] || []), [f.makes]);
 
   return (
-    <aside className="sticky top-[53px] hidden h-[calc(100vh-53px)] w-[280px] shrink-0 overflow-y-auto border-r border-border bg-card px-3.5 pb-6 pt-3.5 lg:block">
-      <div className="mb-3 flex items-baseline justify-between">
-        <h3 className="text-[13px] font-bold uppercase tracking-wider">{t("filters.title")}</h3>
-        <button
-          type="button"
-          onClick={() => setFilters({})}
-          className="text-[11px] font-semibold text-muted-foreground underline underline-offset-[3px] hover:text-foreground transition-colors"
-        >
-          {t("filters.reset")}
-        </button>
-      </div>
-
-      <FilterGroup title={t("filters.price")}>
-        <Range
-          from={f.priceFrom}
-          to={f.priceTo}
-          onFrom={(v) => upd({ priceFrom: v })}
-          onTo={(v) => upd({ priceTo: v })}
-          fromPh={t("filters.from")}
-          toPh={t("filters.to")}
-        />
-      </FilterGroup>
-
-      <FilterGroup title={t("filters.year")}>
-        <Range
-          from={f.yearFrom}
-          to={f.yearTo}
-          onFrom={(v) => upd({ yearFrom: v })}
-          onTo={(v) => upd({ yearTo: v })}
-          fromPh="2005"
-          toPh="2025"
-        />
-      </FilterGroup>
-
-      <FilterGroup title={t("filters.mileage")}>
-        <Range
-          from={f.mileageFrom}
-          to={f.mileageTo}
-          onFrom={(v) => upd({ mileageFrom: v })}
-          onTo={(v) => upd({ mileageTo: v })}
-          fromPh="0"
-          toPh="300000"
-        />
-      </FilterGroup>
-
-      <FilterGroup title={t("filters.make")} count={(f.makes || []).length}>
-        <Select
-          value=""
-          onValueChange={(v) => {
-            if (!v) return;
-            const cur = f.makes || [];
-            if (!cur.includes(v)) upd({ makes: [...cur, v] });
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={`${t("filters.any")}…`} />
-          </SelectTrigger>
-          <SelectContent>
-            {allMakes.map((m) => (
-              <SelectItem key={m} value={m}>
-                {m}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {(f.makes || []).length > 0 && (
-          <div className="mt-1.5 flex flex-wrap gap-1">
-            {f.makes?.map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => upd({ makes: f.makes?.filter((x) => x !== m) })}
-                className="rounded-full border border-primary bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground"
-              >
-                {m} ×
-              </button>
-            ))}
+    <aside className="sticky top-[53px] hidden h-[calc(100vh-53px)] w-[280px] shrink-0 border-r border-border bg-card lg:block">
+      <ScrollArea className="h-full">
+        <div className="px-3.5 pb-6 pt-3.5">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h3 className="text-[13px] font-bold uppercase tracking-wider">{t("filters.title")}</h3>
+            <button
+              type="button"
+              onClick={() => setFilters({})}
+              className="text-[11px] font-semibold text-muted-foreground underline underline-offset-[3px] hover:text-foreground transition-colors"
+            >
+              {t("filters.reset")}
+            </button>
           </div>
-        )}
-      </FilterGroup>
 
-      {modelOptions.length > 0 && (
-        <FilterGroup title={t("filters.model")} count={(f.models || []).length}>
-          <Chips options={modelOptions} value={f.models || []} onChange={(v) => upd({ models: v })} />
-        </FilterGroup>
-      )}
+          <FilterGroup title={t("filters.price")}>
+            <Range
+              from={f.priceFrom}
+              to={f.priceTo}
+              onFrom={(v) => upd({ priceFrom: v })}
+              onTo={(v) => upd({ priceTo: v })}
+              fromPh={t("filters.from")}
+              toPh={t("filters.to")}
+            />
+          </FilterGroup>
 
-      <FilterGroup title={t("filters.engine")}>
-        <Range
-          from={f.engineFrom}
-          to={f.engineTo}
-          onFrom={(v) => upd({ engineFrom: v })}
-          onTo={(v) => upd({ engineTo: v })}
-          fromPh="1.0"
-          toPh="5.0"
-        />
-      </FilterGroup>
+          <FilterGroup title={t("filters.year")}>
+            <Range
+              from={f.yearFrom}
+              to={f.yearTo}
+              onFrom={(v) => upd({ yearFrom: v })}
+              onTo={(v) => upd({ yearTo: v })}
+              fromPh="2005"
+              toPh="2025"
+            />
+          </FilterGroup>
 
-      <FilterGroup title={t("filters.power")}>
-        <Range
-          from={f.powerFrom}
-          to={f.powerTo}
-          onFrom={(v) => upd({ powerFrom: v })}
-          onTo={(v) => upd({ powerTo: v })}
-          fromPh="80"
-          toPh="500"
-        />
-      </FilterGroup>
+          <FilterGroup title={t("filters.mileage")}>
+            <Range
+              from={f.mileageFrom}
+              to={f.mileageTo}
+              onFrom={(v) => upd({ mileageFrom: v })}
+              onTo={(v) => upd({ mileageTo: v })}
+              fromPh="0"
+              toPh="300000"
+            />
+          </FilterGroup>
 
-      <FilterGroup title={t("filters.fuel")}>
-        <Chips options={FUELS} value={f.fuels || []} onChange={(v) => upd({ fuels: v })} />
-      </FilterGroup>
-      <FilterGroup title={t("filters.transmission")}>
-        <Chips options={TRANSMISSIONS} value={f.trans || []} onChange={(v) => upd({ trans: v })} />
-      </FilterGroup>
-      <FilterGroup title={t("filters.drive")}>
-        <Chips options={DRIVES} value={f.drives || []} onChange={(v) => upd({ drives: v })} />
-      </FilterGroup>
-      <FilterGroup title={t("filters.body")}>
-        <Chips options={BODIES} value={f.bodies || []} onChange={(v) => upd({ bodies: v })} />
-      </FilterGroup>
-      <FilterGroup title={t("filters.city")}>
-        <Chips options={CITIES} value={f.cities || []} onChange={(v) => upd({ cities: v })} />
-      </FilterGroup>
-      <FilterGroup title={t("filters.color")}>
-        <Chips options={COLORS} value={f.colors || []} onChange={(v) => upd({ colors: v })} />
-      </FilterGroup>
+          <FilterGroup title={t("filters.make")} count={(f.makes || []).length}>
+            <Select
+              value=""
+              onValueChange={(v) => {
+                if (!v) return;
+                const cur = f.makes || [];
+                if (!cur.includes(v)) upd({ makes: [...cur, v] });
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={`${t("filters.any")}…`} />
+              </SelectTrigger>
+              <SelectContent>
+                {allMakes.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(f.makes || []).length > 0 && (
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                {f.makes?.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => upd({ makes: f.makes?.filter((x) => x !== m) })}
+                    className="rounded-full border border-primary bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground"
+                  >
+                    {m} ×
+                  </button>
+                ))}
+              </div>
+            )}
+          </FilterGroup>
 
-      <FilterGroup title={t("filters.source")}>
-        <Select value={f.channel || "any"} onValueChange={(v) => upd({ channel: v === "any" ? undefined : v })}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">{t("filters.any")}</SelectItem>
-            {TG_CHANNELS.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </FilterGroup>
+          {modelOptions.length > 0 && (
+            <FilterGroup title={t("filters.model")} count={(f.models || []).length}>
+              <Chips options={modelOptions} value={f.models || []} onChange={(v) => upd({ models: v })} />
+            </FilterGroup>
+          )}
 
-      <FilterGroup title="">
-        <label htmlFor="filter-vin-only" className="flex items-center gap-2 py-1 text-xs cursor-pointer">
-          <Checkbox id="filter-vin-only" checked={!!f.vinOnly} onCheckedChange={(v) => upd({ vinOnly: !!v })} />
-          {t("filters.vin")}
-        </label>
-        <label htmlFor="filter-price-only" className="flex items-center gap-2 py-1 text-xs cursor-pointer">
-          <Checkbox id="filter-price-only" checked={!!f.priceOnly} onCheckedChange={(v) => upd({ priceOnly: !!v })} />
-          {t("filters.withPrice")}
-        </label>
-      </FilterGroup>
+          <FilterGroup title={t("filters.engine")}>
+            <Range
+              from={f.engineFrom}
+              to={f.engineTo}
+              onFrom={(v) => upd({ engineFrom: v })}
+              onTo={(v) => upd({ engineTo: v })}
+              fromPh="1.0"
+              toPh="5.0"
+            />
+          </FilterGroup>
+
+          <FilterGroup title={t("filters.power")}>
+            <Range
+              from={f.powerFrom}
+              to={f.powerTo}
+              onFrom={(v) => upd({ powerFrom: v })}
+              onTo={(v) => upd({ powerTo: v })}
+              fromPh="80"
+              toPh="500"
+            />
+          </FilterGroup>
+
+          <FilterGroup title={t("filters.fuel")}>
+            <Chips options={FUELS} value={f.fuels || []} onChange={(v) => upd({ fuels: v })} />
+          </FilterGroup>
+          <FilterGroup title={t("filters.transmission")}>
+            <Chips options={TRANSMISSIONS} value={f.trans || []} onChange={(v) => upd({ trans: v })} />
+          </FilterGroup>
+          <FilterGroup title={t("filters.drive")}>
+            <Chips options={DRIVES} value={f.drives || []} onChange={(v) => upd({ drives: v })} />
+          </FilterGroup>
+          <FilterGroup title={t("filters.body")}>
+            <Chips options={BODIES} value={f.bodies || []} onChange={(v) => upd({ bodies: v })} />
+          </FilterGroup>
+          <FilterGroup title={t("filters.city")}>
+            <Chips options={CITIES} value={f.cities || []} onChange={(v) => upd({ cities: v })} />
+          </FilterGroup>
+          <FilterGroup title={t("filters.color")}>
+            <Chips options={COLORS} value={f.colors || []} onChange={(v) => upd({ colors: v })} />
+          </FilterGroup>
+
+          <FilterGroup title={t("filters.source")}>
+            <Select value={f.channel || "any"} onValueChange={(v) => upd({ channel: v === "any" ? undefined : v })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">{t("filters.any")}</SelectItem>
+                {TG_CHANNELS.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FilterGroup>
+
+          <FilterGroup title="">
+            <label htmlFor="filter-vin-only" className="flex items-center gap-2 py-1 text-xs cursor-pointer">
+              <Checkbox id="filter-vin-only" checked={!!f.vinOnly} onCheckedChange={(v) => upd({ vinOnly: !!v })} />
+              {t("filters.vin")}
+            </label>
+            <label htmlFor="filter-price-only" className="flex items-center gap-2 py-1 text-xs cursor-pointer">
+              <Checkbox
+                id="filter-price-only"
+                checked={!!f.priceOnly}
+                onCheckedChange={(v) => upd({ priceOnly: !!v })}
+              />
+              {t("filters.withPrice")}
+            </label>
+          </FilterGroup>
+        </div>
+      </ScrollArea>
     </aside>
   );
 }

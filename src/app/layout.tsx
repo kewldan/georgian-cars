@@ -16,8 +16,8 @@ const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", weigh
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "GeorgianCars — авто из Telegram-каналов Грузии",
-  description: "Marketplace для объявлений из Telegram, нормализованных ИИ.",
+  title: "GeorgianCars",
+  description: "Маркетплейс для объявлений",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

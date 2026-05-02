@@ -9,6 +9,8 @@ services:
       - virtual-hosts
     depends_on:
       - web
+    environment:
+      NEXT_PUBLIC_SITE_URL: https://cars.kewldan.ru
     labels:
       - traefik.http.routers.cars-ge.rule=Host(`cars.kewldan.ru`)
       - traefik.enable=true
