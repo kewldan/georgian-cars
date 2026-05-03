@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
 import { apiServer } from "@/lib/api-server";
 import { FX, type Listing } from "@/lib/data";
 import { ASH, INK, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, SLATE } from "@/lib/og";
@@ -30,10 +31,26 @@ function absoluteUrl(src: string) {
   return `${SITE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
 }
 
+// Satori (next/og) doesn't support WebP. Fetch and re-encode to PNG as a data URL.
+async function loadPhotoAsPng(src: string): Promise<string | null> {
+  if (!src) return null;
+  if (src.startsWith("data:")) return src;
+  try {
+    const res = await fetch(absoluteUrl(src));
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    const png = await sharp(buf).resize(840, 840, { fit: "cover" }).png().toBuffer();
+    return `data:image/png;base64,${png.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const listing = await apiServer<Listing>(`/listings/${encodeURIComponent(id)}`);
   const fonts = await loadOgFonts();
+  const photoSrc = listing ? await loadPhotoAsPng(listing.photos[0]) : null;
 
   if (!listing) {
     return new ImageResponse(
@@ -191,13 +208,15 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           }}
         >
           {/* biome-ignore lint/performance/noImgElement: ImageResponse/Satori does not support next/image */}
-          <img
-            src={absoluteUrl(listing.photos[0])}
-            alt=""
-            width={420}
-            height={420}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
+          {photoSrc ? (
+            <img
+              src={photoSrc}
+              alt=""
+              width={420}
+              height={420}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : null}
           {listing.vinChecked ? (
             <div
               style={{
