@@ -23,6 +23,22 @@ function formatKmCompact(n: number) {
   return `${Math.round(n / 1000)}k km`;
 }
 
+function isKnownStr(v: string | null | undefined): v is string {
+  if (!v) return false;
+  const s = v.trim().toLowerCase();
+  return s !== "" && s !== "unknown" && s !== "—" && s !== "-" && s !== "?";
+}
+
+function buildSpecs(listing: Listing): string[] {
+  const out: string[] = [];
+  if (listing.year > 0) out.push(String(listing.year));
+  if (isKnownStr(listing.body)) out.push(listing.body);
+  if (listing.fuel === "Electric") out.push("EV");
+  else if (listing.engine > 0) out.push(`${listing.engine}L`);
+  if (listing.mileage > 0) out.push(formatKmCompact(listing.mileage));
+  return out;
+}
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 function absoluteUrl(src: string) {
@@ -107,7 +123,8 @@ export default async function Image({ params }: { params: Promise<{ id: string }
 
           <div
             style={{
-              display: "flex",
+              display: "block",
+              maxWidth: "100%",
               marginTop: 32,
               fontSize: 64,
               fontWeight: 800,
@@ -116,6 +133,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               lineHeight: 1,
               whiteSpace: "nowrap",
               overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {listing.make} {listing.model}
@@ -133,13 +151,16 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               gap: 14,
             }}
           >
-            <span>{listing.year}</span>
-            <span style={{ color: PAPER, opacity: 0.3 }}>·</span>
-            <span>{listing.body}</span>
-            <span style={{ color: PAPER, opacity: 0.3 }}>·</span>
-            <span>{listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}</span>
-            <span style={{ color: PAPER, opacity: 0.3 }}>·</span>
-            <span>{formatKmCompact(listing.mileage)}</span>
+            {buildSpecs(listing).flatMap((s, i) =>
+              i === 0
+                ? [<span key={`v-${i}`}>{s}</span>]
+                : [
+                    <span key={`d-${i}`} style={{ color: PAPER, opacity: 0.3 }}>
+                      ·
+                    </span>,
+                    <span key={`v-${i}`}>{s}</span>,
+                  ]
+            )}
           </div>
 
           <div
