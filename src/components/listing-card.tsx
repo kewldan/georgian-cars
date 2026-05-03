@@ -30,13 +30,18 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
       href={`/listing/${listing.id}`}
       className={cn(
         "group flex overflow-hidden rounded-md border border-border bg-card transition-all hover:shadow-md hover:border-foreground/40",
-        isList ? "flex-row min-h-[160px]" : "flex-col"
+        isList ? "flex-row min-h-[120px] sm:min-h-[160px]" : "flex-col"
       )}
     >
-      <div className={cn("relative overflow-hidden bg-muted", isList ? "w-72 shrink-0" : "aspect-[16/10]")}>
+      <div
+        className={cn(
+          "relative overflow-hidden bg-muted",
+          isList ? "w-28 shrink-0 sm:w-72" : "aspect-[16/10]"
+        )}
+      >
         {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
         <img src={listing.photos[0]} alt={`${listing.make} ${listing.model}`} className="h-full w-full object-cover" />
-        <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+        <div className={cn("absolute left-2 top-2 flex flex-wrap gap-1", isList && "hidden sm:flex")}>
           <Badge variant={listing.priceRating}>{ratingLabel}</Badge>
           {listing.vinChecked && <Badge variant="default">VIN ✓</Badge>}
           {listing.postedDays === 0 && <Badge variant="new">NEW</Badge>}
@@ -60,9 +65,9 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5 p-3.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-3 sm:p-3.5">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[15px] font-bold leading-tight tracking-tight">
+          <span className="min-w-0 truncate text-[15px] font-bold leading-tight tracking-tight">
             {listing.make} {listing.model}
           </span>
           <span className="font-mono text-[13px] font-semibold text-muted-foreground shrink-0">{listing.year}</span>
@@ -73,22 +78,22 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
           {listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}
           <span className="mx-2 text-foreground/30">·</span>
           {listing.power} {t("card.hp")}
-          <span className="mx-2 text-foreground/30">·</span>
-          {listing.transmission.slice(0, 4)}
-          <span className="mx-2 text-foreground/30">·</span>
-          {listing.drive}
+          <span className={cn("mx-2 text-foreground/30", isList && "hidden sm:inline")}>·</span>
+          <span className={cn(isList && "hidden sm:inline")}>{listing.transmission.slice(0, 4)}</span>
+          <span className={cn("mx-2 text-foreground/30", isList && "hidden sm:inline")}>·</span>
+          <span className={cn(isList && "hidden sm:inline")}>{listing.drive}</span>
         </div>
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1 font-semibold text-foreground/80">
-            <MapPin className="h-3 w-3" /> {listing.city}
+        <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+          <span className="inline-flex min-w-0 items-center gap-1 font-semibold text-foreground/80">
+            <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{listing.city}</span>
           </span>
-          <span className="font-mono">{ago(listing.postedDays, listing.postedHours, t)}</span>
+          <span className="font-mono shrink-0">{ago(listing.postedDays, listing.postedHours, t)}</span>
         </div>
-        <div className="mt-auto flex items-end justify-between border-t border-dashed border-border pt-2">
-          <span className="font-mono text-xl font-extrabold tracking-tight tabular-nums">
+        <div className="mt-auto flex items-end justify-between gap-2 border-t border-dashed border-border pt-2">
+          <span className="min-w-0 font-mono text-lg sm:text-xl font-extrabold tracking-tight tabular-nums truncate">
             {fmt.price(listing.price, currency, FX)}
           </span>
-          <span className="rounded-md bg-accent px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider font-mono text-accent-foreground">
+          <span className="shrink-0 rounded-md bg-accent px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-mono text-accent-foreground">
             {t("card.details")} →
           </span>
         </div>

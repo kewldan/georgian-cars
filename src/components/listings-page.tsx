@@ -39,7 +39,7 @@ export function ListingsPage() {
   return (
     <div className="mx-auto grid max-w-[1640px] grid-cols-1 lg:grid-cols-[280px_1fr]">
       <FiltersPanel />
-      <section aria-label="Listings" className="px-5 pb-16 pt-3.5 min-w-0">
+      <section aria-label="Listings" className="px-4 pb-16 pt-3.5 min-w-0 sm:px-5">
         <ListingsToolbar count={total} />
         {error && items.length === 0 ? (
           <SwrError error={error} onRetry={() => mutate()} />
