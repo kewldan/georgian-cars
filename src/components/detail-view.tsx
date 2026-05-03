@@ -18,6 +18,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { fetcher } from "@/lib/api";
 import type { Listing } from "@/lib/data";
 import { FX } from "@/lib/data";
@@ -97,7 +98,7 @@ export function DetailView({ listing }: { listing: Listing }) {
               <CarouselContent className="ml-0">
                 {listing.photos.map((p) => (
                   <CarouselItem key={p} className="pl-0">
-                    <div className="aspect-video">
+                    <div className="aspect-[2/1] sm:aspect-video">
                       {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
                       <img src={p} alt="" draggable={false} className="h-full w-full object-cover select-none" />
                     </div>
@@ -107,22 +108,25 @@ export function DetailView({ listing }: { listing: Listing }) {
               <CarouselPrevious className="left-3" />
               <CarouselNext className="right-3" />
             </Carousel>
-            <div className="flex gap-1.5 overflow-x-auto bg-secondary p-1.5">
-              {listing.photos.map((p, i) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => api?.scrollTo(i)}
-                  className={cn(
-                    "h-[60px] w-20 shrink-0 overflow-hidden rounded-sm border-2",
-                    i === photo ? "border-foreground" : "border-transparent"
-                  )}
-                >
-                  {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
-                  <img src={p} alt="" className="h-full w-full object-cover" />
-                </button>
-              ))}
-            </div>
+            <ScrollArea className="bg-secondary">
+              <div className="flex gap-1.5 p-1.5">
+                {listing.photos.map((p, i) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => api?.scrollTo(i)}
+                    className={cn(
+                      "h-12 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-[60px] sm:w-20",
+                      i === photo ? "border-foreground" : "border-transparent"
+                    )}
+                  >
+                    {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
+                    <img src={p} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </Card>
 
           <Card className="mt-3.5 bg-gradient-to-b from-muted to-card p-4">
