@@ -35,6 +35,12 @@ function Spec({ k, v }: { k: string; v: string | number }) {
   );
 }
 
+function isKnownStr(v: string | null | undefined): v is string {
+  if (!v) return false;
+  const s = v.trim().toLowerCase();
+  return s !== "" && s !== "unknown" && s !== "—" && s !== "-" && s !== "?";
+}
+
 export function DetailView({ listing }: { listing: Listing }) {
   const t = useTranslations();
   const [api, setApi] = useState<CarouselApi>();
@@ -141,16 +147,24 @@ export function DetailView({ listing }: { listing: Listing }) {
               {t("detail.specs")}
             </h3>
             <div className="grid grid-cols-2">
-              <Spec k={t("filters.year")} v={listing.year} />
-              <Spec k={t("filters.mileage")} v={`${fmt.km(listing.mileage)} ${t("card.km")}`} />
-              <Spec k={t("filters.engine")} v={listing.fuel === "Electric" ? "EV" : `${listing.engine} L`} />
-              <Spec k={t("filters.power")} v={`${listing.power} ${t("card.hp")}`} />
-              <Spec k={t("filters.fuel")} v={listing.fuel} />
-              <Spec k={t("filters.transmission")} v={listing.transmission} />
-              <Spec k={t("filters.drive")} v={listing.drive} />
-              <Spec k={t("filters.body")} v={listing.body} />
-              <Spec k={t("filters.color")} v={listing.color} />
-              <Spec k={t("filters.city")} v={listing.city} />
+              {listing.year > 0 ? <Spec k={t("filters.year")} v={listing.year} /> : null}
+              {listing.mileage > 0 ? (
+                <Spec k={t("filters.mileage")} v={`${fmt.km(listing.mileage)} ${t("card.km")}`} />
+              ) : null}
+              {listing.fuel === "Electric" ? (
+                <Spec k={t("filters.engine")} v="EV" />
+              ) : listing.engine > 0 ? (
+                <Spec k={t("filters.engine")} v={`${listing.engine} L`} />
+              ) : null}
+              {listing.power > 0 ? <Spec k={t("filters.power")} v={`${listing.power} ${t("card.hp")}`} /> : null}
+              {isKnownStr(listing.fuel) ? <Spec k={t("filters.fuel")} v={listing.fuel} /> : null}
+              {isKnownStr(listing.transmission) ? (
+                <Spec k={t("filters.transmission")} v={listing.transmission} />
+              ) : null}
+              {isKnownStr(listing.drive) ? <Spec k={t("filters.drive")} v={listing.drive} /> : null}
+              {isKnownStr(listing.body) ? <Spec k={t("filters.body")} v={listing.body} /> : null}
+              {isKnownStr(listing.color) ? <Spec k={t("filters.color")} v={listing.color} /> : null}
+              {isKnownStr(listing.city) ? <Spec k={t("filters.city")} v={listing.city} /> : null}
               <Spec k="VIN" v={listing.vinChecked ? `✓ ${t("detail.verified")}` : "—"} />
               <Spec k="Customs" v={listing.customsCleared ? t("detail.cleared") : t("detail.notCleared")} />
             </div>
