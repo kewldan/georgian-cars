@@ -71,20 +71,26 @@ export function DetailView({ listing }: { listing: Listing }) {
   const similar = similarData?.items ?? [];
 
   return (
-    <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-4">
-      <nav className="mb-3.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="mx-auto max-w-[1280px] px-4 pb-16 pt-4 sm:px-5">
+      <nav className="mb-3.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
         <Link href="/" className="hover:text-foreground hover:underline">
           {t("detail.back")}
         </Link>
-        <span className="text-foreground/40">/</span>
-        <span>{listing.make}</span>
-        <span className="text-foreground/40">/</span>
-        <span>{listing.model}</span>
-        <span className="text-foreground/40">/</span>
-        <span className="font-mono">{listing.id}</span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="text-foreground/40">/</span>
+          <span>{listing.make}</span>
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="text-foreground/40">/</span>
+          <span>{listing.model}</span>
+        </span>
+        <span className="inline-flex items-center gap-1.5 min-w-0">
+          <span className="text-foreground/40">/</span>
+          <span className="font-mono break-all min-w-0">{listing.id}</span>
+        </span>
       </nav>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div>
           <Card className="overflow-hidden">
             <Carousel setApi={setApi} opts={{ loop: true }} plugins={[WheelGesturesPlugin()]} className="bg-muted">
@@ -146,7 +152,7 @@ export function DetailView({ listing }: { listing: Listing }) {
               <span className="h-1.5 w-1.5 rounded-sm bg-accent" />
               {t("detail.specs")}
             </h3>
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2">
               {listing.year > 0 ? <Spec k={t("filters.year")} v={listing.year} /> : null}
               {listing.mileage > 0 ? (
                 <Spec k={t("filters.mileage")} v={`${fmt.km(listing.mileage)} ${t("card.km")}`} />
@@ -198,23 +204,23 @@ export function DetailView({ listing }: { listing: Listing }) {
           </Card>
         </div>
 
-        <div className="lg:sticky lg:top-[65px] lg:self-start space-y-3.5">
+        <div className="min-w-0 lg:sticky lg:top-[65px] lg:self-start space-y-3.5">
           <Card className="p-4">
-            <h2 className="text-2xl font-extrabold tracking-tight leading-tight">
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight leading-tight break-words">
               {listing.make} {listing.model}
             </h2>
-            <div className="mb-4 mt-1 font-mono text-[13px] text-muted-foreground">
+            <div className="mb-4 mt-1 font-mono text-[13px] text-muted-foreground break-all">
               {listing.year} · {listing.body} · {listing.id}
             </div>
-            <div className="flex items-end justify-between border-t border-border pt-3.5 mb-3.5">
-              <span className="font-mono text-3xl font-extrabold tracking-tight">
+            <div className="flex items-end justify-between gap-3 border-t border-border pt-3.5 mb-3.5">
+              <span className="font-mono text-2xl sm:text-3xl font-extrabold tracking-tight break-all min-w-0">
                 {fmt.price(listing.price, currency, FX)}
               </span>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => toggleFav(listing.id)}
-                className={cn(isFav && "bg-accent text-accent-foreground border-accent")}
+                className={cn("shrink-0", isFav && "bg-accent text-accent-foreground border-accent")}
               >
                 <Heart className={cn("h-3.5 w-3.5", isFav && "fill-current")} />
               </Button>
@@ -223,7 +229,7 @@ export function DetailView({ listing }: { listing: Listing }) {
               <Button variant="tg" size="lg">
                 <Send className="h-4 w-4" /> {t("detail.openTg")}
               </Button>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Button variant="outline">
                   <Phone className="h-3.5 w-3.5" /> {t("detail.callSeller")}
                 </Button>

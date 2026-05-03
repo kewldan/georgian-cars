@@ -120,7 +120,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               textOverflow: "ellipsis",
             }}
           >
-            {listing.make} {listing.model}
+            {`${listing.make} ${listing.model}`}
           </div>
 
           <div
