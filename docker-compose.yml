@@ -6,6 +6,7 @@ services:
       - 80
     networks:
       - backends
+      - cars-backend
       - virtual-hosts
     depends_on:
       - web
@@ -24,10 +25,16 @@ services:
       - backends
     environment:
       NEXT_PUBLIC_SITE_URL: https://cars.kewldan.ru
+      # Server-side fetch base for RSC (detail page, OG images). Goes back through
+      # nginx so the existing /api → cars-api proxy rule applies. The browser
+      # uses the default `/api` (same-origin), no env var needed.
+      API_URL: http://proxy/api
     expose:
       - 80
 
 networks:
   backends:
+  cars-backend:
+    external: true
   virtual-hosts:
     external: true

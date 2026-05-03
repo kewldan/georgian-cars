@@ -7,9 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BODIES, CITIES, COLORS, DRIVES, FUELS, MAKES, TG_CHANNELS, TRANSMISSIONS } from "@/lib/data";
 import { useListingsParams } from "@/lib/listings-params";
 import type { FilterState } from "@/lib/store";
+import { useFacets } from "@/lib/use-facets";
 import { cn } from "@/lib/utils";
 
 function FilterGroup({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
@@ -91,11 +91,12 @@ function Range({
 function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
   const t = useTranslations();
   const { filters, setFilters } = useListingsParams();
+  const { facets } = useFacets();
   const f = filters;
   const upd = (patch: Partial<FilterState>) => setFilters({ ...f, ...patch });
 
-  const allMakes = useMemo(() => Object.keys(MAKES).sort(), []);
-  const modelOptions = useMemo(() => (f.makes || []).flatMap((m) => MAKES[m] || []), [f.makes]);
+  const allMakes = useMemo(() => Object.keys(facets.makes).sort(), [facets.makes]);
+  const modelOptions = useMemo(() => (f.makes || []).flatMap((m) => facets.makes[m] || []), [f.makes, facets.makes]);
 
   return (
     <div className="px-3.5 pb-6 pt-3.5">
@@ -210,22 +211,22 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
       </FilterGroup>
 
       <FilterGroup title={t("filters.fuel")}>
-        <Chips options={FUELS} value={f.fuels || []} onChange={(v) => upd({ fuels: v })} />
+        <Chips options={facets.fuels} value={f.fuels || []} onChange={(v) => upd({ fuels: v })} />
       </FilterGroup>
       <FilterGroup title={t("filters.transmission")}>
-        <Chips options={TRANSMISSIONS} value={f.trans || []} onChange={(v) => upd({ trans: v })} />
+        <Chips options={facets.transmissions} value={f.trans || []} onChange={(v) => upd({ trans: v })} />
       </FilterGroup>
       <FilterGroup title={t("filters.drive")}>
-        <Chips options={DRIVES} value={f.drives || []} onChange={(v) => upd({ drives: v })} />
+        <Chips options={facets.drives} value={f.drives || []} onChange={(v) => upd({ drives: v })} />
       </FilterGroup>
       <FilterGroup title={t("filters.body")}>
-        <Chips options={BODIES} value={f.bodies || []} onChange={(v) => upd({ bodies: v })} />
+        <Chips options={facets.bodies} value={f.bodies || []} onChange={(v) => upd({ bodies: v })} />
       </FilterGroup>
       <FilterGroup title={t("filters.city")}>
-        <Chips options={CITIES} value={f.cities || []} onChange={(v) => upd({ cities: v })} />
+        <Chips options={facets.cities} value={f.cities || []} onChange={(v) => upd({ cities: v })} />
       </FilterGroup>
       <FilterGroup title={t("filters.color")}>
-        <Chips options={COLORS} value={f.colors || []} onChange={(v) => upd({ colors: v })} />
+        <Chips options={facets.colors} value={f.colors || []} onChange={(v) => upd({ colors: v })} />
       </FilterGroup>
 
       <FilterGroup title={t("filters.source")}>
@@ -235,7 +236,7 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="any">{t("filters.any")}</SelectItem>
-            {TG_CHANNELS.map((c) => (
+            {facets.channels.map((c) => (
               <SelectItem key={c.id} value={c.id}>
                 {c.name}
               </SelectItem>

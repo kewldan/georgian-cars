@@ -4,6 +4,7 @@ import { Heart, MessageSquare, Phone, Send } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { ListingCard } from "@/components/listing-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,10 +17,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { fetcher } from "@/lib/api";
 import type { Listing } from "@/lib/data";
-import { FX, LISTINGS } from "@/lib/data";
+import { FX } from "@/lib/data";
 import { ratingLabel as getRatingLabel, PRICE_BAR_GRADIENT, RATING_META } from "@/lib/rating";
 import { useApp } from "@/lib/store";
+import { useFavorites } from "@/lib/use-favorites";
 import { cn, fmt } from "@/lib/utils";
 
 function Spec({ k, v }: { k: string; v: string | number }) {
@@ -35,7 +38,8 @@ export function DetailView({ listing }: { listing: Listing }) {
   const t = useTranslations();
   const [api, setApi] = useState<CarouselApi>();
   const [photo, setPhoto] = useState(0);
-  const { favorites, toggleFav, currency } = useApp();
+  const { currency } = useApp();
+  const { isFav: isFavId, toggle: toggleFav } = useFavorites();
 
   useEffect(() => {
     if (!api) return;
@@ -48,13 +52,15 @@ export function DetailView({ listing }: { listing: Listing }) {
       api.off("reInit", onSelect);
     };
   }, [api]);
-  const isFav = favorites.includes(listing.id);
+  const isFav = isFavId(listing.id);
   const meta = RATING_META[listing.priceRating];
   const ratingLabel = getRatingLabel(t, listing.priceRating);
 
-  const similar = LISTINGS.filter(
-    (x) => x.id !== listing.id && (x.make === listing.make || x.body === listing.body)
-  ).slice(0, 4);
+  const { data: similarData } = useSWR<{ items: Listing[] }>(
+    `/listings/${encodeURIComponent(listing.id)}/similar?limit=4`,
+    fetcher
+  );
+  const similar = similarData?.items ?? [];
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-4">

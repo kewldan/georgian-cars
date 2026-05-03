@@ -3,8 +3,10 @@ import type { DivIcon } from "leaflet";
 import { ChevronRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
-import { CITIES, FX, LISTINGS } from "@/lib/data";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { fetcher } from "@/lib/api";
+import { FX, type Listing } from "@/lib/data";
 import { useApp } from "@/lib/store";
 import { cn, fmt } from "@/lib/utils";
 
@@ -13,16 +15,7 @@ const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer)
 const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), { ssr: false });
 const Popup = dynamic(() => import("react-leaflet").then((m) => m.Popup), { ssr: false });
 
-const CITY_COORDS: Record<string, [number, number]> = {
-  Tbilisi: [41.7151, 44.8271],
-  Batumi: [41.6168, 41.6367],
-  Kutaisi: [42.2679, 42.718],
-  Rustavi: [41.5495, 45.001],
-  Gori: [41.9847, 44.1086],
-  Zugdidi: [42.5088, 41.8709],
-  Poti: [42.15, 41.671],
-  Telavi: [41.9197, 45.4731],
-};
+type CityCount = { name: string; count: number; lat: number; lng: number };
 
 export function MapView() {
   const t = useTranslations();
@@ -50,24 +43,26 @@ export function MapView() {
     };
   }, []);
 
-  const cityCounts = useMemo(
-    () =>
-      CITIES.map((c) => ({ name: c, count: LISTINGS.filter((l) => l.city === c).length })).sort(
-        (a, b) => b.count - a.count
-      ),
-    []
+  const { data: cityData } = useSWR<{ cities: CityCount[]; total: number }>("/map/cities", fetcher);
+  const cities = cityData?.cities ?? [];
+  const total = cityData?.total ?? 0;
+
+  const { data: cityListings } = useSWR<{ items: Listing[] }>(
+    selected ? `/map/cities/${encodeURIComponent(selected)}/listings?limit=6` : null,
+    fetcher
   );
-  const inCity = LISTINGS.filter((l) => l.city === selected).slice(0, 6);
+  const inCity = cityListings?.items ?? [];
+  const inCityCount = cities.find((c) => c.name === selected)?.count ?? 0;
 
   return (
     <div className="grid h-[calc(100dvh-53px)] grid-cols-1 md:grid-cols-[320px_1fr]">
       <aside className="overflow-y-auto border-r border-border bg-card">
         <div className="border-b border-border px-4 py-3.5">
           <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            {cityCounts.length} {t("map.cities")} · {LISTINGS.length} {t("map.adsIn")}
+            {cities.length} {t("map.cities")} · {total} {t("map.adsIn")}
           </div>
         </div>
-        {cityCounts.map((c) => (
+        {cities.map((c) => (
           <button
             key={c.name}
             type="button"
@@ -97,31 +92,27 @@ export function MapView() {
             maxZoom={20}
           />
           {makeIcon
-            ? cityCounts.map((c) => {
-                const co = CITY_COORDS[c.name];
-                if (!co) return null;
-                return (
-                  <Marker
-                    key={c.name}
-                    position={co}
-                    icon={makeIcon(c.count, selected === c.name)}
-                    eventHandlers={{ click: () => setSelected(c.name) }}
-                  >
-                    <Popup>
-                      <strong>{c.name}</strong>
-                      <br />
-                      {c.count} {t("map.adsIn")}
-                    </Popup>
-                  </Marker>
-                );
-              })
+            ? cities.map((c) => (
+                <Marker
+                  key={c.name}
+                  position={[c.lat, c.lng]}
+                  icon={makeIcon(c.count, selected === c.name)}
+                  eventHandlers={{ click: () => setSelected(c.name) }}
+                >
+                  <Popup>
+                    <strong>{c.name}</strong>
+                    <br />
+                    {c.count} {t("map.adsIn")}
+                  </Popup>
+                </Marker>
+              ))
             : null}
         </MapContainer>
 
         <div className="pointer-events-auto absolute right-4 top-4 bottom-4 z-[1100] hidden w-[320px] overflow-y-auto rounded-md border border-border bg-card p-3.5 md:block">
           <div className="text-base font-extrabold">{selected}</div>
           <div className="mt-1 mb-3 font-mono text-[11px] text-muted-foreground">
-            {LISTINGS.filter((l) => l.city === selected).length} {t("map.adsIn")}
+            {inCityCount} {t("map.adsIn")}
           </div>
           <div className="grid gap-2">
             {inCity.map((l) => (

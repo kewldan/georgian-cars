@@ -7,6 +7,7 @@ import type { Listing } from "@/lib/data";
 import { FX } from "@/lib/data";
 import { ratingLabel as getRatingLabel } from "@/lib/rating";
 import { useApp } from "@/lib/store";
+import { useFavorites } from "@/lib/use-favorites";
 import { cn, fmt } from "@/lib/utils";
 
 function ago(d: number, h: number, t: ReturnType<typeof useTranslations>) {
@@ -17,8 +18,9 @@ function ago(d: number, h: number, t: ReturnType<typeof useTranslations>) {
 
 export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; viewMode?: "grid" | "list" }) {
   const t = useTranslations();
-  const { favorites, toggleFav, currency } = useApp();
-  const isFav = favorites.includes(listing.id);
+  const { currency } = useApp();
+  const { isFav, toggle } = useFavorites();
+  const fav = isFav(listing.id);
   const isList = viewMode === "list";
 
   const ratingLabel = getRatingLabel(t, listing.priceRating);
@@ -43,15 +45,15 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            toggleFav(listing.id);
+            toggle(listing.id);
           }}
           className={cn(
             "absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full border backdrop-blur",
-            isFav ? "bg-accent text-accent-foreground border-accent" : "bg-white/90 text-neutral-900 border-black/5"
+            fav ? "bg-accent text-accent-foreground border-accent" : "bg-white/90 text-neutral-900 border-black/5"
           )}
           aria-label="favorite"
         >
-          <Heart className={cn("h-3.5 w-3.5", isFav && "fill-current")} />
+          <Heart className={cn("h-3.5 w-3.5", fav && "fill-current")} />
         </button>
         <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold font-mono text-white">
           <ImageIcon className="h-2.5 w-2.5" /> {listing.photos.length}

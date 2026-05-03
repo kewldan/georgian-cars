@@ -1,24 +1,63 @@
 "use client";
 import { Bell, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { api, fetcher } from "@/lib/api";
+import type { FilterState } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-type Saved = { id: number; name: string; crit: string; total: number; fresh: number; on: boolean };
-const INITIAL: Saved[] = [
-  { id: 1, name: "BMW X5 до $30k", crit: "BMW X5 · 2018+ · до 30 000$ · Tbilisi", total: 27, fresh: 4, on: true },
-  { id: 2, name: "Электро SUV", crit: "EV · SUV · до 200 000 км · любой город", total: 14, fresh: 2, on: true },
-  { id: 3, name: "Дешёвые Toyota", crit: "Toyota · до $10k · АКП · с фото", total: 41, fresh: 0, on: false },
-  { id: 4, name: "Mercedes E-Class", crit: "Mercedes E-Class · 2015+ · растаможено", total: 8, fresh: 1, on: true },
-];
+type Saved = {
+  id: string;
+  name: string;
+  crit: string;
+  filters: FilterState;
+  notify: boolean;
+  total: number;
+  fresh: number;
+  lastMatchAt: string | null;
+};
+
+const KEY = "/saved-searches";
 
 export default function SavedPage() {
   const t = useTranslations();
-  const [items, setItems] = useState<Saved[]>(INITIAL);
+  const { data, isLoading } = useSWR<{ items: Saved[] }>(KEY, fetcher);
+  const { mutate } = useSWRConfig();
+  const items = data?.items ?? [];
   const total = items.reduce((s, i) => s + i.total, 0);
-  const fresh = items.reduce((s, i) => s + (i.on ? i.fresh : 0), 0);
+  const fresh = items.reduce((s, i) => s + (i.notify ? i.fresh : 0), 0);
+
+  const toggleNotify = async (it: Saved) => {
+    mutate(KEY, { items: items.map((x) => (x.id === it.id ? { ...x, notify: !x.notify } : x)) }, false);
+    try {
+      await api(`${KEY}/${it.id}`, { method: "PATCH", body: JSON.stringify({ notify: !it.notify }) });
+      mutate(KEY);
+    } catch {
+      mutate(KEY);
+    }
+  };
+
+  const remove = async (it: Saved) => {
+    mutate(KEY, { items: items.filter((x) => x.id !== it.id) }, false);
+    try {
+      await api(`${KEY}/${it.id}`, { method: "DELETE" });
+      mutate(KEY);
+    } catch {
+      mutate(KEY);
+    }
+  };
+
+  const create = async () => {
+    const name = typeof window !== "undefined" ? window.prompt(t("saved.newAlert")) : null;
+    if (!name) return;
+    await api(KEY, {
+      method: "POST",
+      body: JSON.stringify({ name, filters: {}, notify: true }),
+    });
+    mutate(KEY);
+  };
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-4">
@@ -30,7 +69,7 @@ export default function SavedPage() {
           </div>
           <div className="mt-1 max-w-md text-xs text-muted-foreground">{t("saved.desc")}</div>
         </div>
-        <Button>
+        <Button onClick={create}>
           <Plus className="h-3.5 w-3.5" /> {t("saved.newAlert")}
         </Button>
       </div>
@@ -51,7 +90,15 @@ export default function SavedPage() {
       </div>
 
       <div className="grid gap-3">
-        {items.length === 0 ? (
+        {isLoading && items.length === 0 ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <Card
+              // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder, no semantic identity
+              key={i}
+              className="h-[68px] animate-pulse"
+            />
+          ))
+        ) : items.length === 0 ? (
           <Card className="px-4 py-10 text-center text-sm text-muted-foreground">{t("saved.empty")}</Card>
         ) : null}
         {items.map((it) => (
@@ -61,7 +108,7 @@ export default function SavedPage() {
               <div className="mt-1 font-mono text-[11px] text-muted-foreground">{it.crit}</div>
             </div>
             <div className="text-right">
-              {it.fresh > 0 && it.on ? (
+              {it.fresh > 0 && it.notify ? (
                 <span className="inline-block rounded-full bg-accent px-2 py-0.5 font-mono text-[11px] font-bold text-accent-foreground">
                   +{it.fresh} {t("saved.newToday")}
                 </span>
@@ -72,17 +119,17 @@ export default function SavedPage() {
             </div>
             <button
               type="button"
-              onClick={() => setItems((s) => s.map((x) => (x.id === it.id ? { ...x, on: !x.on } : x)))}
+              onClick={() => toggleNotify(it)}
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold",
-                it.on ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border"
+                it.notify ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border"
               )}
             >
-              <Bell className="h-3 w-3" /> {it.on ? "Telegram" : "off"}
+              <Bell className="h-3 w-3" /> {it.notify ? "Telegram" : "off"}
             </button>
             <button
               type="button"
-              onClick={() => setItems((s) => s.filter((x) => x.id !== it.id))}
+              onClick={() => remove(it)}
               aria-label={t("saved.delete")}
               title={t("saved.delete")}
               className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"

@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
-import { FX, LISTINGS } from "@/lib/data";
+import { apiServer } from "@/lib/api-server";
+import { FX, type Listing } from "@/lib/data";
 import { ASH, INK, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, SLATE } from "@/lib/og";
 import { loadOgFonts } from "@/lib/og-fonts";
 import { type PriceRating, RATING_META } from "@/lib/rating";
@@ -23,7 +24,7 @@ function formatKmCompact(n: number) {
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const listing = LISTINGS.find((l) => l.id === id);
+  const listing = await apiServer<Listing>(`/listings/${encodeURIComponent(id)}`);
   const fonts = await loadOgFonts();
 
   if (!listing) {

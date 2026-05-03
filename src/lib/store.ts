@@ -27,8 +27,6 @@ export type FilterState = {
 };
 
 type AppState = {
-  favorites: string[];
-  toggleFav: (id: string) => void;
   currency: "USD" | "RUB";
   setCurrency: (c: "USD" | "RUB") => void;
   palette: "electric" | "sunset" | "azure" | "tbilisi";
@@ -40,11 +38,6 @@ type AppState = {
 export const useApp = create<AppState>()(
   persist(
     (set) => ({
-      favorites: [],
-      toggleFav: (id) =>
-        set((st) => ({
-          favorites: st.favorites.includes(id) ? st.favorites.filter((x) => x !== id) : [...st.favorites, id],
-        })),
       currency: "USD",
       setCurrency: (c) => set({ currency: c }),
       palette: "electric",

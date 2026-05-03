@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/request";
 import { Mark } from "@/lib/og";
 import { useApp } from "@/lib/store";
+import { useFavorites } from "@/lib/use-favorites";
 import { cn } from "@/lib/utils";
 
 type Currency = "USD" | "RUB";
@@ -57,7 +58,8 @@ export function TopBar() {
   const locale = useLocale() as Locale;
   const { theme, setTheme } = useTheme();
   const [isPending, startTransition] = useTransition();
-  const { favorites, currency, setCurrency, palette } = useApp();
+  const { currency, setCurrency, palette } = useApp();
+  const { ids: favorites } = useFavorites();
 
   // Apply palette as data-attribute on <html>
   useEffect(() => {
