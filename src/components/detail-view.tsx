@@ -92,7 +92,7 @@ export function DetailView({ listing }: { listing: Listing }) {
       </nav>
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div>
+        <div className="min-w-0">
           <Card className="overflow-hidden">
             <Carousel setApi={setApi} opts={{ loop: true }} plugins={[WheelGesturesPlugin()]} className="bg-muted">
               <CarouselContent className="ml-0">
