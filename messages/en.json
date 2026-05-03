@@ -82,5 +82,6 @@
     "newToday": "new today",
     "delete": "Delete saved search"
   },
-  "map": { "title": "Map", "cities": "cities", "adsIn": "listings" }
+  "map": { "title": "Map", "cities": "cities", "adsIn": "listings" },
+  "error": { "title": "Failed to load", "retry": "Try again" }
 }

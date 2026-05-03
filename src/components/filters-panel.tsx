@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+import { SwrError } from "@/components/swr-error";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -91,7 +92,7 @@ function Range({
 function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
   const t = useTranslations();
   const { filters, setFilters } = useListingsParams();
-  const { facets } = useFacets();
+  const { facets, error: facetsError, mutate: mutateFacets } = useFacets();
   const f = filters;
   const upd = (patch: Partial<FilterState>) => setFilters({ ...f, ...patch });
 
@@ -110,6 +111,12 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
           >
             {t("filters.reset")}
           </button>
+        </div>
+      ) : null}
+
+      {facetsError ? (
+        <div className="mb-3">
+          <SwrError error={facetsError} onRetry={() => mutateFacets()} compact />
         </div>
       ) : null}
 

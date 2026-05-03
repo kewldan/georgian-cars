@@ -39,9 +39,9 @@ const FALLBACK: Facets = {
 };
 
 export function useFacets() {
-  const { data, isLoading } = useSWR<Facets>("/facets", fetcher, {
+  const { data, error, isLoading, mutate } = useSWR<Facets>("/facets", fetcher, {
     dedupingInterval: 30_000,
     revalidateOnFocus: false,
   });
-  return { facets: data ?? FALLBACK, isLoading };
+  return { facets: data ?? FALLBACK, isLoading, error, mutate };
 }

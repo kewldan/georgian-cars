@@ -36,6 +36,7 @@ const LOCALE_OPTIONS: Array<{ code: Locale; flag: string; label: string }> = [
 
 function Flag({ emoji, className }: { emoji: string; className?: string }) {
   return (
+    // biome-ignore lint/performance/noImgElement: tiny third-party CDN icon, next/image is overkill
     <img
       src={`https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=apple`}
       alt=""

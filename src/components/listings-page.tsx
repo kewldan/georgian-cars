@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { FiltersPanel } from "@/components/filters-panel";
 import { ListingCard } from "@/components/listing-card";
 import { ListingsToolbar } from "@/components/listings-toolbar";
+import { SwrError } from "@/components/swr-error";
 import { fetcher } from "@/lib/api";
 import { listingsKey } from "@/lib/api-listings";
 import type { Listing } from "@/lib/data";
@@ -29,7 +30,7 @@ export function ListingsPage() {
   const { filters, search, sort, clearAll } = useListingsParams();
   const filtersActive = hasActiveFilters(filters, search);
 
-  const { data, isLoading } = useSWR<Page>(listingsKey(filters, search, sort), fetcher, {
+  const { data, error, isLoading, mutate } = useSWR<Page>(listingsKey(filters, search, sort), fetcher, {
     keepPreviousData: true,
   });
   const items = data?.items ?? [];
@@ -40,7 +41,9 @@ export function ListingsPage() {
       <FiltersPanel />
       <section aria-label="Listings" className="px-5 pb-16 pt-3.5 min-w-0">
         <ListingsToolbar count={total} />
-        {isLoading && items.length === 0 ? (
+        {error && items.length === 0 ? (
+          <SwrError error={error} onRetry={() => mutate()} />
+        ) : isLoading && items.length === 0 ? (
           <div className="grid gap-3.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
             {Array.from({ length: 8 }).map((_, i) => (
               <div

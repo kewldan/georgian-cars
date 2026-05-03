@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { ListingCard } from "@/components/listing-card";
+import { SwrError } from "@/components/swr-error";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -56,10 +57,11 @@ export function DetailView({ listing }: { listing: Listing }) {
   const meta = RATING_META[listing.priceRating];
   const ratingLabel = getRatingLabel(t, listing.priceRating);
 
-  const { data: similarData } = useSWR<{ items: Listing[] }>(
-    `/listings/${encodeURIComponent(listing.id)}/similar?limit=4`,
-    fetcher
-  );
+  const {
+    data: similarData,
+    error: similarError,
+    mutate: mutateSimilar,
+  } = useSWR<{ items: Listing[] }>(`/listings/${encodeURIComponent(listing.id)}/similar?limit=4`, fetcher);
   const similar = similarData?.items ?? [];
 
   return (
@@ -241,7 +243,14 @@ export function DetailView({ listing }: { listing: Listing }) {
         </div>
       </div>
 
-      {similar.length > 0 && (
+      {similarError && similar.length === 0 ? (
+        <>
+          <h3 className="mt-10 mb-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
+            {t("detail.similar")}
+          </h3>
+          <SwrError error={similarError} onRetry={() => mutateSimilar()} compact />
+        </>
+      ) : similar.length > 0 ? (
         <>
           <h3 className="mt-10 mb-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
             {t("detail.similar")}
@@ -252,7 +261,7 @@ export function DetailView({ listing }: { listing: Listing }) {
             ))}
           </div>
         </>
-      )}
+      ) : null}
     </div>
   );
 }

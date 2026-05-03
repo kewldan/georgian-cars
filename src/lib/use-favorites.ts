@@ -5,7 +5,7 @@ import { api, fetcher } from "@/lib/api";
 const KEY = "/favorites/ids";
 
 export function useFavorites() {
-  const { data, isLoading } = useSWR<{ ids: string[] }>(KEY, fetcher);
+  const { data, error, isLoading } = useSWR<{ ids: string[] }>(KEY, fetcher);
   const { mutate } = useSWRConfig();
 
   const ids = data?.ids ?? [];
@@ -28,5 +28,5 @@ export function useFavorites() {
     }
   };
 
-  return { ids, isFav, toggle, isLoading };
+  return { ids, isFav, toggle, isLoading, error };
 }

@@ -2,6 +2,7 @@
 import { Bell, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import useSWR, { useSWRConfig } from "swr";
+import { SwrError } from "@/components/swr-error";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api, fetcher } from "@/lib/api";
@@ -23,7 +24,7 @@ const KEY = "/saved-searches";
 
 export default function SavedPage() {
   const t = useTranslations();
-  const { data, isLoading } = useSWR<{ items: Saved[] }>(KEY, fetcher);
+  const { data, error, isLoading, mutate: mutateSelf } = useSWR<{ items: Saved[] }>(KEY, fetcher);
   const { mutate } = useSWRConfig();
   const items = data?.items ?? [];
   const total = items.reduce((s, i) => s + i.total, 0);
@@ -90,7 +91,9 @@ export default function SavedPage() {
       </div>
 
       <div className="grid gap-3">
-        {isLoading && items.length === 0 ? (
+        {error && items.length === 0 ? (
+          <SwrError error={error} onRetry={() => mutateSelf()} />
+        ) : isLoading && items.length === 0 ? (
           Array.from({ length: 3 }).map((_, i) => (
             <Card
               // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder, no semantic identity

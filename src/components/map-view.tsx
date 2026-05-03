@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { SwrError } from "@/components/swr-error";
 import { fetcher } from "@/lib/api";
 import { FX, type Listing } from "@/lib/data";
 import { useApp } from "@/lib/store";
@@ -43,11 +44,19 @@ export function MapView() {
     };
   }, []);
 
-  const { data: cityData } = useSWR<{ cities: CityCount[]; total: number }>("/map/cities", fetcher);
+  const {
+    data: cityData,
+    error: citiesError,
+    mutate: mutateCities,
+  } = useSWR<{ cities: CityCount[]; total: number }>("/map/cities", fetcher);
   const cities = cityData?.cities ?? [];
   const total = cityData?.total ?? 0;
 
-  const { data: cityListings } = useSWR<{ items: Listing[] }>(
+  const {
+    data: cityListings,
+    error: cityListingsError,
+    mutate: mutateCityListings,
+  } = useSWR<{ items: Listing[] }>(
     selected ? `/map/cities/${encodeURIComponent(selected)}/listings?limit=6` : null,
     fetcher
   );
@@ -62,6 +71,11 @@ export function MapView() {
             {cities.length} {t("map.cities")} · {total} {t("map.adsIn")}
           </div>
         </div>
+        {citiesError && cities.length === 0 ? (
+          <div className="p-3.5">
+            <SwrError error={citiesError} onRetry={() => mutateCities()} compact />
+          </div>
+        ) : null}
         {cities.map((c) => (
           <button
             key={c.name}
@@ -114,6 +128,9 @@ export function MapView() {
           <div className="mt-1 mb-3 font-mono text-[11px] text-muted-foreground">
             {inCityCount} {t("map.adsIn")}
           </div>
+          {cityListingsError && inCity.length === 0 ? (
+            <SwrError error={cityListingsError} onRetry={() => mutateCityListings()} compact />
+          ) : null}
           <div className="grid gap-2">
             {inCity.map((l) => (
               <a
