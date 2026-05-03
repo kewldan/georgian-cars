@@ -29,15 +29,15 @@ import { cn } from "@/lib/utils";
 type Currency = "USD" | "RUB";
 
 const LOCALE_OPTIONS: Array<{ code: Locale; flag: string; label: string }> = [
-  { code: "ru", flag: "ru", label: "Русский" },
-  { code: "en", flag: "gb", label: "English" },
-  { code: "ka", flag: "ge", label: "ქართული" },
+  { code: "ru", flag: "🇷🇺", label: "Русский" },
+  { code: "en", flag: "🇬🇧", label: "English" },
+  { code: "ka", flag: "🇬🇪", label: "ქართული" },
 ];
 
-function Flag({ code, className }: { code: string; className?: string }) {
+function Flag({ emoji, className }: { emoji: string; className?: string }) {
   return (
     <img
-      src={`https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/${code}.svg`}
+      src={`https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=apple`}
       alt=""
       aria-hidden="true"
       className={className}
@@ -241,7 +241,7 @@ function LanguageSwitch({
           aria-label={current.label}
           className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 transition-colors"
         >
-          <Flag code={current.flag} className="h-3 w-[18px] rounded-[1px] object-cover" />
+          <Flag emoji={current.flag} className="h-4 w-4 object-contain" />
           <span className="hidden sm:inline">{current.code}</span>
           <ChevronDown className="h-3 w-3 opacity-60" />
         </button>
@@ -261,7 +261,7 @@ function LanguageSwitch({
                 opt.code === locale && "bg-secondary font-semibold"
               )}
             >
-              <Flag code={opt.flag} className="h-3.5 w-[21px] rounded-[1px] object-cover" />
+              <Flag emoji={opt.flag} className="h-[18px] w-[18px] object-contain" />
               <span className="flex-1">{opt.label}</span>
               <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{opt.code}</span>
             </DropdownMenu.Item>
