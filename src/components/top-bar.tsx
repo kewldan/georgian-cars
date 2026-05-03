@@ -81,7 +81,7 @@ export function TopBar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 flex min-h-[53px] items-center gap-3 border-b border-border bg-background px-4">
+    <header className="sticky top-0 z-50 flex w-screen min-h-[53px] items-center gap-3 border-b border-border bg-background px-4">
       <BurgerMenu navItems={navItems} pathname={pathname} />
 
       <Link

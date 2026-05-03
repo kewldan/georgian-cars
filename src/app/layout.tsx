@@ -29,7 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static no-flash theme bootstrap, no user input */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-screen bg-secondary">
+      <body className="min-h-screen w-screen overflow-x-hidden bg-secondary">
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-lg"
@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <TopBar />
-            <main id="main">{children}</main>
+            <main id="main" className="w-screen">{children}</main>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

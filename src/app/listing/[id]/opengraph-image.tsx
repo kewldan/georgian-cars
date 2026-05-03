@@ -22,6 +22,14 @@ function formatKmCompact(n: number) {
   return `${Math.round(n / 1000)}k km`;
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+function absoluteUrl(src: string) {
+  if (!src) return src;
+  if (/^(https?:|data:)/.test(src)) return src;
+  return `${SITE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
+}
+
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const listing = await apiServer<Listing>(`/listings/${encodeURIComponent(id)}`);
@@ -184,7 +192,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         >
           {/* biome-ignore lint/performance/noImgElement: ImageResponse/Satori does not support next/image */}
           <img
-            src={listing.photos[0]}
+            src={absoluteUrl(listing.photos[0])}
             alt=""
             width={420}
             height={420}
