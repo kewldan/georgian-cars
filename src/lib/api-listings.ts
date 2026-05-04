@@ -1,6 +1,14 @@
 import type { FilterState } from "@/lib/store";
 
-export function listingsKey(filters: FilterState, search: string, sort: string, page = 1, pageSize = 24) {
+export const LISTINGS_PAGE_SIZE = 24;
+
+export function listingsKey(
+  filters: FilterState,
+  search: string,
+  sort: string,
+  page = 1,
+  pageSize = LISTINGS_PAGE_SIZE,
+) {
   const p = new URLSearchParams();
   if (search) p.set("q", search);
   for (const [k, v] of Object.entries(filters)) {

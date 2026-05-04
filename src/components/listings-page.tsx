@@ -1,13 +1,14 @@
 "use client";
 import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
-import useSWR from "swr";
+import { useEffect, useRef } from "react";
+import useSWRInfinite from "swr/infinite";
 import { FiltersPanel } from "@/components/filters-panel";
 import { ListingCard } from "@/components/listing-card";
 import { ListingsToolbar } from "@/components/listings-toolbar";
 import { SwrError } from "@/components/swr-error";
 import { fetcher } from "@/lib/api";
-import { listingsKey } from "@/lib/api-listings";
+import { LISTINGS_PAGE_SIZE, listingsKey } from "@/lib/api-listings";
 import type { Listing } from "@/lib/data";
 import { useListingsParams } from "@/lib/listings-params";
 import { useApp } from "@/lib/store";
@@ -30,11 +31,35 @@ export function ListingsPage() {
   const { filters, search, sort, clearAll } = useListingsParams();
   const filtersActive = hasActiveFilters(filters, search);
 
-  const { data, error, isLoading, mutate } = useSWR<Page>(listingsKey(filters, search, sort), fetcher, {
-    keepPreviousData: true,
-  });
-  const items = data?.items ?? [];
-  const total = data?.total ?? 0;
+  const { data, error, isLoading, isValidating, size, setSize, mutate } = useSWRInfinite<Page>(
+    (index, prev) => {
+      if (prev && prev.items.length < prev.pageSize) return null;
+      return listingsKey(filters, search, sort, index + 1);
+    },
+    fetcher,
+    { keepPreviousData: true, revalidateFirstPage: false },
+  );
+
+  const pages = data ?? [];
+  const items = pages.flatMap((p) => p.items);
+  const total = pages[0]?.total ?? 0;
+  const pageSize = pages[0]?.pageSize ?? LISTINGS_PAGE_SIZE;
+  const hasMore = items.length < total;
+  const isLoadingMore = isValidating && size > 1 && !!data && typeof data[size - 1] === "undefined";
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore || isLoading || isLoadingMore) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setSize((s) => s + 1);
+      },
+      { rootMargin: "600px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, isLoading, isLoadingMore, setSize]);
 
   return (
     <div className="mx-auto grid max-w-[1640px] grid-cols-1 lg:grid-cols-[280px_1fr]">
@@ -70,14 +95,26 @@ export function ListingsPage() {
             ) : null}
           </div>
         ) : (
-          <div
-            className={cn("grid gap-3.5", viewMode === "list" && "grid-cols-1")}
-            style={viewMode === "grid" ? { gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" } : undefined}
-          >
-            {items.map((l) => (
-              <ListingCard key={l.id} listing={l} viewMode={viewMode} />
-            ))}
-          </div>
+          <>
+            <div
+              className={cn("grid gap-3.5", viewMode === "list" && "grid-cols-1")}
+              style={viewMode === "grid" ? { gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" } : undefined}
+            >
+              {items.map((l) => (
+                <ListingCard key={l.id} listing={l} viewMode={viewMode} />
+              ))}
+              {isLoadingMore
+                ? Array.from({ length: Math.min(pageSize, 8) }).map((_, i) => (
+                    <div
+                      // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder, no semantic identity
+                      key={`more-${i}`}
+                      className="aspect-[16/10] animate-pulse rounded-md bg-muted"
+                    />
+                  ))
+                : null}
+            </div>
+            {hasMore ? <div ref={sentinelRef} aria-hidden className="h-px w-full" /> : null}
+          </>
         )}
       </section>
     </div>
