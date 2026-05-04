@@ -37,7 +37,7 @@ export function ListingsPage() {
       return listingsKey(filters, search, sort, index + 1);
     },
     fetcher,
-    { keepPreviousData: true, revalidateFirstPage: false },
+    { keepPreviousData: true, revalidateFirstPage: false }
   );
 
   const pages = data ?? [];
@@ -55,7 +55,7 @@ export function ListingsPage() {
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) setSize((s) => s + 1);
       },
-      { rootMargin: "600px 0px" },
+      { rootMargin: "600px 0px" }
     );
     io.observe(el);
     return () => io.disconnect();

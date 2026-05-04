@@ -7,7 +7,7 @@ export function listingsKey(
   search: string,
   sort: string,
   page = 1,
-  pageSize = LISTINGS_PAGE_SIZE,
+  pageSize = LISTINGS_PAGE_SIZE
 ) {
   const p = new URLSearchParams();
   if (search) p.set("q", search);
