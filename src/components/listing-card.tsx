@@ -33,12 +33,7 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
         isList ? "flex-row min-h-[120px] sm:min-h-[160px]" : "flex-col"
       )}
     >
-      <div
-        className={cn(
-          "relative overflow-hidden bg-muted",
-          isList ? "w-28 shrink-0 sm:w-72" : "aspect-[16/10]"
-        )}
-      >
+      <div className={cn("relative overflow-hidden bg-muted", isList ? "w-28 shrink-0 sm:w-72" : "aspect-[16/10]")}>
         {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
         <img src={listing.photos[0]} alt={`${listing.make} ${listing.model}`} className="h-full w-full object-cover" />
         <div className={cn("absolute left-2 top-2 flex flex-wrap gap-1", isList && "hidden sm:flex")}>

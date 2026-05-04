@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { SwrError } from "@/components/swr-error";
+import { useTheme } from "@/components/theme-provider";
 import { fetcher } from "@/lib/api";
 import { FX, type Listing } from "@/lib/data";
 import { useApp } from "@/lib/store";
@@ -23,6 +24,8 @@ export function MapView() {
   const { currency } = useApp();
   const [selected, setSelected] = useState("Tbilisi");
   const [makeIcon, setMakeIcon] = useState<((count: number, active: boolean) => DivIcon) | null>(null);
+
+  const { theme } = useTheme();
 
   useEffect(() => {
     let cancelled = false;
@@ -98,7 +101,12 @@ export function MapView() {
       </aside>
 
       <div className="relative">
-        <MapContainer center={[42.0, 43.5]} zoom={7} className="h-full w-full" style={{ background: "#000" }}>
+        <MapContainer
+          center={[42.0, 43.5]}
+          zoom={7}
+          className="h-full w-full"
+          style={{ background: theme === "dark" ? "#000" : "#fff" }}
+        >
           <TileLayer
             attribution="&copy; OpenStreetMap &copy; CARTO"
             url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"

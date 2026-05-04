@@ -11,8 +11,6 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       // Real listing photos: replace with the host(s) the API returns.
-      // { protocol: "https", hostname: "cdn.your-domain.tld" },
-      { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "**.basemaps.cartocdn.com" },
     ],
   },

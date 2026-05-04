@@ -39,7 +39,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <TopBar />
-            <main id="main" className="w-screen">{children}</main>
+            <main id="main" className="w-screen">
+              {children}
+            </main>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
