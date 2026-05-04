@@ -7,9 +7,7 @@ import { loadOgFonts } from "@/lib/og-fonts";
 import { type PriceRating, RATING_META } from "@/lib/rating";
 import { fmt } from "@/lib/utils";
 
-export const alt = "GeorgianCars listing";
 export const size = OG_SIZE;
-export const contentType = OG_CONTENT_TYPE;
 
 const ratingOgLabel: Record<PriceRating, string> = {
   great: "GREAT DEAL",
@@ -209,8 +207,8 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             background: INK,
           }}
         >
-          {/* biome-ignore lint/performance/noImgElement: ImageResponse/Satori does not support next/image */}
           {photoSrc ? (
+            // biome-ignore lint/performance/noImgElement: ImageResponse/Satori does not support next/image
             <img
               src={photoSrc}
               alt=""

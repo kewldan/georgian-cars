@@ -4,6 +4,7 @@ import { Heart, MessageSquare, Phone, Send } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 import useSWR from "swr";
 import { ListingCard } from "@/components/listing-card";
 import { SwrError } from "@/components/swr-error";
@@ -96,14 +97,18 @@ export function DetailView({ listing }: { listing: Listing }) {
           <Card className="overflow-hidden">
             <Carousel setApi={setApi} opts={{ loop: true }} plugins={[WheelGesturesPlugin()]} className="bg-muted">
               <CarouselContent className="ml-0">
-                {listing.photos.map((p) => (
-                  <CarouselItem key={p} className="pl-0">
-                    <div className="aspect-[2/1] sm:aspect-video">
-                      {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
-                      <img src={p} alt="" draggable={false} className="h-full w-full object-cover select-none" />
-                    </div>
-                  </CarouselItem>
-                ))}
+                <PhotoProvider>
+                  {listing.photos.map((p) => (
+                    <CarouselItem key={p} className="pl-0">
+                      <div className="aspect-2/1 sm:aspect-video">
+                        <PhotoView src={p}>
+                          {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
+                          <img src={p} alt="" draggable={false} className="h-full w-full object-cover select-none" />
+                        </PhotoView>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </PhotoProvider>
               </CarouselContent>
               <CarouselPrevious className="left-3" />
               <CarouselNext className="right-3" />
