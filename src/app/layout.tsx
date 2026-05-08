@@ -23,7 +23,7 @@ const manrope = Manrope({
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://cars.kewldan.ru"),
   title: "GeorgianCars",
   description: "Маркетплейс для объявлений",
 };

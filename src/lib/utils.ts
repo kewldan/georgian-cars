@@ -30,7 +30,7 @@ export const fmt = {
 // fetches them via the public host (in prod that's cars.kewldan.ru, dev is
 // localhost). Backend returns paths like "/api/images/123.webp"; we prepend
 // NEXT_PUBLIC_SITE_URL when missing a scheme.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cars.kewldan.ru";
 
 export function photoSrc(src: string): string {
   if (!src) return src;

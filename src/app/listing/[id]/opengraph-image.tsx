@@ -21,7 +21,7 @@ function formatKmCompact(n: number) {
   return `${Math.round(n / 1000)}k km`;
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cars.kewldan.ru";
 
 function absoluteUrl(src: string) {
   if (!src) return src;
