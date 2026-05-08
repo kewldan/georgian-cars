@@ -18,9 +18,7 @@ const nextConfig: NextConfig = {
     // In dev, the browser hits /api/... — Next forwards to uvicorn on :8080
     // and strips the /api prefix to match FastAPI's /v1 routes. Mirrors what
     // nginx does in production, so the same `/api` paths work in both.
-    return [
-      { source: "/api/:path*", destination: "http://localhost:8080/:path*" },
-    ];
+    return [{ source: "/api/:path*", destination: "http://localhost:8080/:path*" }];
   },
 };
 

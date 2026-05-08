@@ -3,6 +3,7 @@ import { Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import useSWR from "swr";
 import { ListingCard } from "@/components/listing-card";
+import { ListingCardSkeletonGrid } from "@/components/listing-card-skeleton";
 import { SwrError } from "@/components/swr-error";
 import { fetcher } from "@/lib/api";
 import type { Listing } from "@/lib/data";
@@ -23,15 +24,7 @@ export default function FavoritesPage() {
       {error && list.length === 0 ? (
         <SwrError error={error} onRetry={() => mutate()} />
       ) : isLoading && list.length === 0 ? (
-        <div className="grid gap-3.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder, no semantic identity
-              key={i}
-              className="aspect-[16/10] animate-pulse rounded-md bg-muted"
-            />
-          ))}
-        </div>
+        <ListingCardSkeletonGrid count={6} />
       ) : list.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground">
           <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-muted">

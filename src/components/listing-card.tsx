@@ -1,5 +1,5 @@
 "use client";
-import { Heart, ImageIcon, MapPin } from "lucide-react";
+import { GitCompare, Heart, ImageIcon, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Listing } from "@/lib/data";
 import { FX } from "@/lib/data";
 import { ratingLabel as getRatingLabel } from "@/lib/rating";
-import { useApp } from "@/lib/store";
+import { COMPARE_LIMIT, useApp } from "@/lib/store";
 import { useFavorites } from "@/lib/use-favorites";
 import { cn, fmt } from "@/lib/utils";
 
@@ -17,52 +17,97 @@ function ago(d: number, h: number, t: ReturnType<typeof useTranslations>) {
   return t("card.ago_now");
 }
 
-export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; viewMode?: "grid" | "list" }) {
+export function ListingCard({
+  listing,
+  viewMode = "grid",
+  priority = false,
+}: {
+  listing: Listing;
+  viewMode?: "grid" | "list";
+  priority?: boolean;
+}) {
+  if (viewMode === "list") return <ListingRow listing={listing} priority={priority} />;
+  return <ListingGridCard listing={listing} priority={priority} />;
+}
+
+function FavButton({ id, fav, onToggle }: { id: string; fav: boolean; onToggle: (id: string) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        onToggle(id);
+      }}
+      className={cn(
+        "grid h-7 w-7 place-items-center rounded-full border backdrop-blur",
+        fav ? "bg-accent text-accent-foreground border-accent" : "bg-white/90 text-neutral-900 border-black/5"
+      )}
+      aria-label="favorite"
+      aria-pressed={fav}
+    >
+      <Heart className={cn("h-3.5 w-3.5", fav && "fill-current")} />
+    </button>
+  );
+}
+
+function CompareToggle({ id }: { id: string }) {
+  const t = useTranslations();
+  const compare = useApp((s) => s.compare);
+  const toggleCompare = useApp((s) => s.toggleCompare);
+  const on = compare.includes(id);
+  const disabled = !on && compare.length >= COMPARE_LIMIT;
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        if (!disabled) toggleCompare(id);
+      }}
+      disabled={disabled}
+      aria-label={on ? t("listings.removeFromCompare") : t("listings.addToCompare")}
+      aria-pressed={on}
+      title={on ? t("listings.removeFromCompare") : t("listings.addToCompare")}
+      className={cn(
+        "grid h-7 w-7 place-items-center rounded-full border backdrop-blur transition-colors disabled:opacity-40 disabled:cursor-not-allowed",
+        on ? "bg-primary text-primary-foreground border-primary" : "bg-white/90 text-neutral-900 border-black/5"
+      )}
+    >
+      <GitCompare className="h-3.5 w-3.5" />
+    </button>
+  );
+}
+
+function ListingGridCard({ listing, priority }: { listing: Listing; priority: boolean }) {
   const t = useTranslations();
   const { currency } = useApp();
   const { isFav, toggle } = useFavorites();
   const fav = isFav(listing.id);
-  const isList = viewMode === "list";
-
   const ratingLabel = getRatingLabel(t, listing.priceRating);
 
   return (
     <Link
       href={`/listing/${listing.id}`}
-      className={cn(
-        "group flex overflow-hidden rounded-md border border-border bg-card transition-all hover:shadow-md hover:border-foreground/40",
-        isList ? "flex-row min-h-[120px] sm:min-h-[160px]" : "flex-col"
-      )}
+      className="group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-all hover:shadow-md hover:border-foreground/40"
     >
-      <div className={cn("relative overflow-hidden bg-muted", isList ? "w-28 shrink-0 sm:w-72" : "aspect-[16/10]")}>
+      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         <Image
           src={listing.photos[0]}
           alt={`${listing.make} ${listing.model}`}
           fill
-          sizes={
-            isList ? "(min-width: 640px) 288px, 112px" : "(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
-          }
+          sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
+          priority={priority}
+          loading={priority ? undefined : "lazy"}
           className="object-cover"
         />
-        <div className={cn("absolute left-2 top-2 flex flex-wrap gap-1", isList && "hidden sm:flex")}>
+        <div className="absolute left-2 top-2 flex flex-wrap gap-1">
           <Badge variant={listing.priceRating}>{ratingLabel}</Badge>
           {listing.vinChecked && <Badge variant="default">VIN ✓</Badge>}
           {listing.postedDays === 0 && <Badge variant="new">NEW</Badge>}
         </div>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            toggle(listing.id);
-          }}
-          className={cn(
-            "absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full border backdrop-blur",
-            fav ? "bg-accent text-accent-foreground border-accent" : "bg-white/90 text-neutral-900 border-black/5"
-          )}
-          aria-label="favorite"
-        >
-          <Heart className={cn("h-3.5 w-3.5", fav && "fill-current")} />
-        </button>
+        <div className="absolute right-2 top-2 flex flex-col gap-1.5">
+          <FavButton id={listing.id} fav={fav} onToggle={toggle} />
+          <CompareToggle id={listing.id} />
+        </div>
         <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-semibold font-mono text-white">
           <ImageIcon className="h-2.5 w-2.5" /> {listing.photos.length}
         </span>
@@ -81,10 +126,10 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
           {listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}
           <span className="mx-2 text-foreground/30">·</span>
           {listing.power}&nbsp;{t("card.hp")}
-          <span className={cn("mx-2 text-foreground/30", isList && "hidden sm:inline")}>·</span>
-          <span className={cn(isList && "hidden sm:inline")}>{listing.transmission.slice(0, 4)}</span>
-          <span className={cn("mx-2 text-foreground/30", isList && "hidden sm:inline")}>·</span>
-          <span className={cn(isList && "hidden sm:inline")}>{listing.drive}</span>
+          <span className="mx-2 text-foreground/30">·</span>
+          <span>{listing.transmission.slice(0, 4)}</span>
+          <span className="mx-2 text-foreground/30">·</span>
+          <span>{listing.drive}</span>
         </div>
         <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
           <span className="inline-flex min-w-0 items-center gap-1 font-semibold text-foreground/80">
@@ -100,6 +145,93 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
             {t("card.details")} →
           </span>
         </div>
+      </div>
+    </Link>
+  );
+}
+
+function ListingRow({ listing, priority }: { listing: Listing; priority: boolean }) {
+  const t = useTranslations();
+  const { currency } = useApp();
+  const { isFav, toggle } = useFavorites();
+  const fav = isFav(listing.id);
+  const ratingLabel = getRatingLabel(t, listing.priceRating);
+
+  return (
+    <Link
+      href={`/listing/${listing.id}`}
+      className="group grid items-center gap-3 rounded-md border border-border bg-card px-3 py-2.5 transition-colors hover:border-foreground/40 hover:bg-secondary/50 sm:px-3.5 sm:py-3"
+      style={{
+        gridTemplateColumns: "auto minmax(0, 1.4fr) auto auto",
+        gridTemplateAreas: '"thumb title price fav"',
+      }}
+    >
+      <div className="relative h-14 w-20 overflow-hidden rounded-sm bg-muted shrink-0" style={{ gridArea: "thumb" }}>
+        <Image
+          src={listing.photos[0]}
+          alt=""
+          fill
+          sizes="80px"
+          priority={priority}
+          loading={priority ? undefined : "lazy"}
+          className="object-cover"
+        />
+        {listing.postedDays === 0 ? (
+          <span className="absolute left-1 top-1 rounded-sm bg-accent px-1 font-mono text-[9px] font-bold uppercase tracking-wider text-accent-foreground">
+            new
+          </span>
+        ) : null}
+      </div>
+
+      <div className="min-w-0" style={{ gridArea: "title" }}>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <span className="min-w-0 truncate text-[14px] font-bold leading-tight">
+            {listing.make} {listing.model}
+          </span>
+          <span className="font-mono text-[12px] font-semibold text-muted-foreground">{listing.year}</span>
+          <Badge variant={listing.priceRating} className="hidden sm:inline-flex">
+            {ratingLabel}
+          </Badge>
+          {listing.vinChecked ? (
+            <Badge variant="default" className="hidden sm:inline-flex">
+              VIN ✓
+            </Badge>
+          ) : null}
+        </div>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-muted-foreground">
+          <span>
+            {fmt.km(listing.mileage)} {t("card.km")}
+          </span>
+          <span className="text-foreground/30">·</span>
+          <span>{listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}</span>
+          <span className="text-foreground/30">·</span>
+          <span>
+            {listing.power} {t("card.hp")}
+          </span>
+          <span className="text-foreground/30">·</span>
+          <span>{listing.transmission.slice(0, 4)}</span>
+          <span className="text-foreground/30">·</span>
+          <span>{listing.drive}</span>
+          <span className="text-foreground/30">·</span>
+          <span className="inline-flex items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            {listing.city}
+          </span>
+          <span className="text-foreground/30">·</span>
+          <span>{ago(listing.postedDays, listing.postedHours, t)}</span>
+        </div>
+      </div>
+
+      <span
+        className="font-mono text-base sm:text-lg font-extrabold tracking-tight tabular-nums shrink-0 text-right"
+        style={{ gridArea: "price" }}
+      >
+        {fmt.price(listing.price, currency, FX)}
+      </span>
+
+      <div className="flex items-center gap-1.5" style={{ gridArea: "fav" }}>
+        <CompareToggle id={listing.id} />
+        <FavButton id={listing.id} fav={fav} onToggle={toggle} />
       </div>
     </Link>
   );

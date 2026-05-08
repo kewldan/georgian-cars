@@ -22,11 +22,9 @@ import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/request";
 import { Mark } from "@/lib/og";
-import { useApp } from "@/lib/store";
+import { type Currency, useApp } from "@/lib/store";
 import { useFavorites } from "@/lib/use-favorites";
 import { cn } from "@/lib/utils";
-
-type Currency = "USD" | "RUB";
 
 const LOCALE_OPTIONS: Array<{ code: Locale; flag: string; label: string }> = [
   { code: "ru", flag: "🇷🇺", label: "Русский" },
@@ -36,7 +34,7 @@ const LOCALE_OPTIONS: Array<{ code: Locale; flag: string; label: string }> = [
 
 function Flag({ emoji, className }: { emoji: string; className?: string }) {
   return (
-    // biome-ignore lint/performance/noImgElement: tiny third-party CDN icon, next/image is overkill
+    // biome-ignore lint/performance/noImgElement: tiny third-party CDN icon, native flag glyphs render poorly on Windows Chrome
     <img
       src={`https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=apple`}
       alt=""
@@ -51,6 +49,7 @@ function Flag({ emoji, className }: { emoji: string; className?: string }) {
 const CURRENCY_OPTIONS: Array<{ code: Currency; symbol: string; label: string }> = [
   { code: "USD", symbol: "$", label: "US Dollar" },
   { code: "RUB", symbol: "₽", label: "Российский рубль" },
+  { code: "GEL", symbol: "₾", label: "ქართული ლარი" },
 ];
 
 export function TopBar() {
@@ -62,7 +61,8 @@ export function TopBar() {
   const { currency, setCurrency, palette } = useApp();
   const { ids: favorites } = useFavorites();
 
-  // Apply palette as data-attribute on <html>
+  // Mirror palette to <html data-palette> after client-side changes (SSR sets the
+  // initial value from the cookie; this keeps it in sync when the user picks a new one).
   useEffect(() => {
     document.documentElement.setAttribute("data-palette", palette);
   }, [palette]);

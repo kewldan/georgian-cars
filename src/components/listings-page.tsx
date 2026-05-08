@@ -3,9 +3,12 @@ import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
+import { ActiveFilters } from "@/components/active-filters";
 import { FiltersPanel } from "@/components/filters-panel";
 import { ListingCard } from "@/components/listing-card";
+import { ListingCardSkeleton, ListingCardSkeletonGrid } from "@/components/listing-card-skeleton";
 import { ListingsToolbar } from "@/components/listings-toolbar";
+import { RecentStrip } from "@/components/recent-strip";
 import { SwrError } from "@/components/swr-error";
 import { fetcher } from "@/lib/api";
 import { LISTINGS_PAGE_SIZE, listingsKey } from "@/lib/api-listings";
@@ -66,18 +69,12 @@ export function ListingsPage() {
       <FiltersPanel />
       <section aria-label="Listings" className="px-4 pb-16 pt-3.5 min-w-0 sm:px-5">
         <ListingsToolbar count={total} />
+        <ActiveFilters />
+        {!filtersActive ? <RecentStrip /> : null}
         {error && items.length === 0 ? (
           <SwrError error={error} onRetry={() => mutate()} />
         ) : isLoading && items.length === 0 ? (
-          <div className="grid gap-3.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder, no semantic identity
-                key={i}
-                className="aspect-[16/10] animate-pulse rounded-md bg-muted"
-              />
-            ))}
-          </div>
+          <ListingCardSkeletonGrid count={8} viewMode={viewMode} />
         ) : items.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground">
             <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-muted">
@@ -100,15 +97,15 @@ export function ListingsPage() {
               className={cn("grid gap-3.5", viewMode === "list" && "grid-cols-1")}
               style={viewMode === "grid" ? { gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" } : undefined}
             >
-              {items.map((l) => (
-                <ListingCard key={l.id} listing={l} viewMode={viewMode} />
+              {items.map((l, i) => (
+                <ListingCard key={l.id} listing={l} viewMode={viewMode} priority={i < 4} />
               ))}
               {isLoadingMore
-                ? Array.from({ length: Math.min(pageSize, 8) }).map((_, i) => (
-                    <div
+                ? Array.from({ length: Math.min(pageSize, 8) }, (_, i) => (
+                    <ListingCardSkeleton
                       // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder, no semantic identity
                       key={`more-${i}`}
-                      className="aspect-[16/10] animate-pulse rounded-md bg-muted"
+                      viewMode={viewMode}
                     />
                   ))
                 : null}

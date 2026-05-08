@@ -16,7 +16,8 @@
     "mileage_asc": "Lowest mileage",
     "year_desc": "Newest year",
     "year_asc": "Oldest year",
-    "best_deal": "Best deal"
+    "best_deal": "Best deal",
+    "bargain": "Open to bargain"
   },
   "filters": {
     "title": "Filters",
@@ -35,11 +36,38 @@
     "color": "Color",
     "vin": "VIN-checked only",
     "withPrice": "With price only",
+    "customsCleared": "Customs cleared",
+    "bargain": "Open to bargain",
     "source": "Telegram channel",
     "reset": "Reset",
     "any": "any",
     "from": "from",
     "to": "to"
+  },
+  "listings": {
+    "active": "Active filters",
+    "removeFilter": "Remove filter",
+    "saveSearch": "Save search",
+    "compareSelected": "Compare ({n})",
+    "addToCompare": "Add to compare",
+    "removeFromCompare": "Remove from compare",
+    "viewGrid": "Grid view",
+    "viewList": "List view"
+  },
+  "compare": {
+    "title": "Compare",
+    "empty": "Pick listings to compare from the grid.",
+    "remove": "Remove",
+    "max": "Up to 4 listings"
+  },
+  "recent": { "title": "Recently viewed", "clear": "Clear" },
+  "save": {
+    "title": "Save this search",
+    "name": "Name",
+    "namePlaceholder": "e.g. Tbilisi diesel SUV",
+    "notify": "Notify in Telegram on new matches",
+    "submit": "Save",
+    "cancel": "Cancel"
   },
   "card": {
     "km": "km",
@@ -82,6 +110,6 @@
     "newToday": "new today",
     "delete": "Delete saved search"
   },
-  "map": { "title": "Map", "cities": "cities", "adsIn": "listings" },
+  "map": { "title": "Map", "cities": "cities", "adsIn": "listings", "onMap": "On the map" },
   "error": { "title": "Failed to load", "retry": "Try again" }
 }

@@ -1,5 +1,6 @@
 "use client";
-import { Bell, Plus, Trash2 } from "lucide-react";
+import { Bell, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import useSWR, { useSWRConfig } from "swr";
 import { SwrError } from "@/components/swr-error";
@@ -50,16 +51,6 @@ export default function SavedPage() {
     }
   };
 
-  const create = async () => {
-    const name = typeof window !== "undefined" ? window.prompt(t("saved.newAlert")) : null;
-    if (!name) return;
-    await api(KEY, {
-      method: "POST",
-      body: JSON.stringify({ name, filters: {}, notify: true }),
-    });
-    mutate(KEY);
-  };
-
   return (
     <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-4">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
@@ -70,8 +61,8 @@ export default function SavedPage() {
           </div>
           <div className="mt-1 max-w-md text-xs text-muted-foreground">{t("saved.desc")}</div>
         </div>
-        <Button onClick={create}>
-          <Plus className="h-3.5 w-3.5" /> {t("saved.newAlert")}
+        <Button asChild>
+          <Link href="/">{t("saved.newAlert")} →</Link>
         </Button>
       </div>
 

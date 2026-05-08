@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import sharp from "sharp";
 import { apiServer } from "@/lib/api-server";
 import { FX, type Listing } from "@/lib/data";
-import { ASH, INK, LIME, Mark, OG_CONTENT_TYPE, OG_SIZE, OGShell, PAPER, SLATE } from "@/lib/og";
+import { ASH, INK, LIME, Mark, OG_SIZE, OGShell, PAPER, SLATE } from "@/lib/og";
 import { loadOgFonts } from "@/lib/og-fonts";
 import { type PriceRating, RATING_META } from "@/lib/rating";
 import { fmt } from "@/lib/utils";

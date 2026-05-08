@@ -109,8 +109,13 @@ export function MapView() {
           style={{ background: theme === "dark" ? "#000" : "#fff" }}
         >
           <TileLayer
+            key={theme}
             attribution="&copy; OpenStreetMap &copy; CARTO"
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            url={
+              theme === "dark"
+                ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            }
             subdomains={["a", "b", "c", "d"]}
             maxZoom={20}
           />

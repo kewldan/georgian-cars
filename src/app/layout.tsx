@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Manrope } from "next/font/google";
+import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { CompareBar } from "@/components/compare-bar";
+import { SwrProvider } from "@/components/swr-provider";
 import { ThemeProvider, themeInitScript } from "@/components/theme-provider";
 import { TopBar } from "@/components/top-bar";
+import { PALETTE_COOKIE } from "@/lib/store";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
+import "react-photo-view/dist/react-photo-view.css";
+
+const PALETTES = ["electric", "sunset", "azure", "tbilisi"] as const;
+type Palette = (typeof PALETTES)[number];
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
@@ -21,10 +29,16 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
-  const messages = await getMessages();
+  const [locale, messages, cookieStore] = await Promise.all([getLocale(), getMessages(), cookies()]);
+  const cookiePalette = cookieStore.get(PALETTE_COOKIE)?.value as Palette | undefined;
+  const palette: Palette = PALETTES.includes(cookiePalette as Palette) ? (cookiePalette as Palette) : "electric";
   return (
-    <html lang={locale} suppressHydrationWarning className={`${manrope.variable} ${mono.variable}`}>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      data-palette={palette}
+      className={`${manrope.variable} ${mono.variable}`}
+    >
       <head>
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static no-flash theme bootstrap, no user input */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
@@ -37,12 +51,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>
-            <TopBar />
-            <main id="main" className="w-screen">
-              {children}
-            </main>
-          </ThemeProvider>
+          <SwrProvider>
+            <ThemeProvider>
+              <TopBar />
+              <main id="main" className="w-screen">
+                {children}
+              </main>
+              <CompareBar />
+            </ThemeProvider>
+          </SwrProvider>
         </NextIntlClientProvider>
       </body>
     </html>

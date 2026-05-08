@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { MobileFiltersButton } from "@/components/filters-panel";
+import { SaveSearchButton } from "@/components/save-search-button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -44,6 +45,7 @@ export function ListingsToolbar({ count }: { count: number }) {
           />
         </div>
         <MobileFiltersButton />
+        <SaveSearchButton />
         <Select value={sort} onValueChange={setSort}>
           <SelectTrigger className="w-[170px] sm:w-[200px]">
             <SelectValue />
@@ -51,6 +53,7 @@ export function ListingsToolbar({ count }: { count: number }) {
           <SelectContent>
             <SelectItem value="newest">{t("sort.newest")}</SelectItem>
             <SelectItem value="best_deal">{t("sort.best_deal")}</SelectItem>
+            <SelectItem value="bargain">{t("sort.bargain")}</SelectItem>
             <SelectItem value="cheap">{t("sort.cheap")}</SelectItem>
             <SelectItem value="expensive">{t("sort.expensive")}</SelectItem>
             <SelectItem value="mileage_asc">{t("sort.mileage_asc")}</SelectItem>

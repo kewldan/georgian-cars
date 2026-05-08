@@ -1,6 +1,6 @@
 "use client";
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
-import { Heart, MessageSquare, Phone, Send } from "lucide-react";
+import { Heart, Send } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import useSWR from "swr";
 import { ListingCard } from "@/components/listing-card";
+import { MiniMap } from "@/components/mini-map";
+import { RecentStrip, TrackRecent } from "@/components/recent-strip";
 import { SwrError } from "@/components/swr-error";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -99,7 +101,7 @@ export function DetailView({ listing }: { listing: Listing }) {
             <Carousel setApi={setApi} opts={{ loop: true }} plugins={[WheelGesturesPlugin()]} className="bg-muted">
               <CarouselContent className="ml-0">
                 <PhotoProvider>
-                  {listing.photos.map((p) => (
+                  {listing.photos.map((p, i) => (
                     <CarouselItem key={p} className="pl-0">
                       <div className="relative aspect-2/1 sm:aspect-video">
                         <PhotoView src={p}>
@@ -108,8 +110,10 @@ export function DetailView({ listing }: { listing: Listing }) {
                             alt=""
                             fill
                             sizes="(min-width: 1024px) calc(100vw - 380px - 4rem), 100vw"
+                            priority={i === 0}
+                            loading={i === 0 ? undefined : "lazy"}
                             draggable={false}
-                            className="object-cover select-none"
+                            className="object-cover select-none cursor-zoom-in"
                           />
                         </PhotoView>
                       </div>
@@ -237,49 +241,26 @@ export function DetailView({ listing }: { listing: Listing }) {
                 variant="outline"
                 size="icon"
                 onClick={() => toggleFav(listing.id)}
+                aria-label="favorite"
+                aria-pressed={isFav}
                 className={cn("shrink-0", isFav && "bg-accent text-accent-foreground border-accent")}
               >
                 <Heart className={cn("h-3.5 w-3.5", isFav && "fill-current")} />
               </Button>
             </div>
             <div className="grid gap-2">
-              <Button
-                variant="tg"
-                size="lg"
-                onClick={() => {
-                  // TODO: Metrika
-
-                  window.open("https://t.me/kewldan", "_blank");
-                }}
-              >
-                <Send className="h-4 w-4" /> {t("detail.openTg")}
+              <Button asChild variant="tg" size="lg">
+                <a href={`https://t.me/${listing.channel.id}`} target="_blank" rel="noopener noreferrer">
+                  <Send className="h-4 w-4" /> {t("detail.openTg")}
+                </a>
               </Button>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // TODO: Metrika
-
-                    window.open("https://t.me/kewldan", "_blank");
-                  }}
-                >
-                  <Phone className="h-3.5 w-3.5" /> {t("detail.callSeller")}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // TODO: Metrika
-
-                    window.open("https://t.me/kewldan", "_blank");
-                  }}
-                >
-                  <MessageSquare className="h-3.5 w-3.5" /> {t("detail.message")}
-                </Button>
-              </div>
             </div>
           </Card>
 
-          <div className="flex items-center gap-2.5 rounded-md border border-border bg-secondary px-3.5 py-2.5">
+          <Link
+            href={`/?channel=${encodeURIComponent(listing.channel.id)}`}
+            className="flex items-center gap-2.5 rounded-md border border-border bg-secondary px-3.5 py-2.5 transition-colors hover:border-foreground/40"
+          >
             <div className="grid h-7 w-7 place-items-center rounded-full bg-[#229ED9] text-white">
               <Send className="h-3.5 w-3.5" />
             </div>
@@ -289,7 +270,7 @@ export function DetailView({ listing }: { listing: Listing }) {
                 {(listing.channel.subs / 1000).toFixed(1)}k subs
               </div>
             </div>
-          </div>
+          </Link>
 
           <Card className="p-3.5">
             <h3 className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -299,6 +280,8 @@ export function DetailView({ listing }: { listing: Listing }) {
             <div className="text-sm font-bold">{listing.seller}</div>
             <div className="mt-1 font-mono text-[11px] text-muted-foreground">{listing.city}</div>
           </Card>
+
+          <MiniMap city={listing.city} />
         </div>
       </div>
 
@@ -321,6 +304,9 @@ export function DetailView({ listing }: { listing: Listing }) {
           </div>
         </>
       ) : null}
+
+      <RecentStrip excludeId={listing.id} />
+      <TrackRecent id={listing.id} />
     </div>
   );
 }

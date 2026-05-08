@@ -47,6 +47,8 @@ export function parseListingsParams(sp: URLSearchParams): ListingsParams {
   if (channel) filters.channel = channel;
   if (sp.get("vinOnly") === "1") filters.vinOnly = true;
   if (sp.get("priceOnly") === "1") filters.priceOnly = true;
+  if (sp.get("bargain") === "1") filters.bargain = true;
+  if (sp.get("customsCleared") === "1") filters.customsCleared = true;
   return {
     filters,
     search: sp.get("q") ?? "",
@@ -69,6 +71,8 @@ export function serializeListingsParams({ filters, search, sort }: ListingsParam
   if (filters.channel) sp.set("channel", filters.channel);
   if (filters.vinOnly) sp.set("vinOnly", "1");
   if (filters.priceOnly) sp.set("priceOnly", "1");
+  if (filters.bargain) sp.set("bargain", "1");
+  if (filters.customsCleared) sp.set("customsCleared", "1");
   return sp.toString();
 }
 

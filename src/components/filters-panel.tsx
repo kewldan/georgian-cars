@@ -2,12 +2,13 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SwrError } from "@/components/swr-error";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { useListingsParams } from "@/lib/listings-params";
 import type { FilterState } from "@/lib/store";
 import { useFacets } from "@/lib/use-facets";
@@ -35,6 +36,7 @@ function Chips({ options, value, onChange }: { options: string[]; value: string[
           <button
             key={opt}
             type="button"
+            aria-pressed={on}
             onClick={() => {
               const ns = new Set(set);
               if (on) ns.delete(opt);
@@ -59,32 +61,65 @@ function Chips({ options, value, onChange }: { options: string[]; value: string[
 function Range({
   from,
   to,
-  onFrom,
-  onTo,
+  onCommit,
   fromPh,
   toPh,
+  bounds,
+  step = 1,
 }: {
   from?: number;
   to?: number;
-  onFrom: (v?: number) => void;
-  onTo: (v?: number) => void;
+  onCommit: (next: { from?: number; to?: number }) => void;
   fromPh: string;
   toPh: string;
+  bounds?: { min: number; max: number };
+  step?: number;
 }) {
+  const hasBounds = !!bounds && bounds.max > bounds.min;
+  const lo = hasBounds ? bounds.min : 0;
+  const hi = hasBounds ? bounds.max : 0;
+
+  const [local, setLocal] = useState<[number, number]>([from ?? lo, to ?? hi]);
+
+  useEffect(() => {
+    setLocal([from ?? lo, to ?? hi]);
+  }, [from, to, lo, hi]);
+
   return (
-    <div className="grid grid-cols-2 gap-1.5">
-      <Input
-        type="number"
-        placeholder={fromPh}
-        value={from ?? ""}
-        onChange={(e) => onFrom(e.target.value === "" ? undefined : +e.target.value)}
-      />
-      <Input
-        type="number"
-        placeholder={toPh}
-        value={to ?? ""}
-        onChange={(e) => onTo(e.target.value === "" ? undefined : +e.target.value)}
-      />
+    <div className="space-y-2">
+      {hasBounds ? (
+        <Slider
+          min={lo}
+          max={hi}
+          step={step}
+          value={local}
+          onValueChange={(v) => setLocal([v[0] ?? lo, v[1] ?? hi])}
+          onValueCommit={(v) => {
+            const a = v[0] ?? lo;
+            const b = v[1] ?? hi;
+            onCommit({
+              from: a <= lo ? undefined : a,
+              to: b >= hi ? undefined : b,
+            });
+          }}
+          aria-label="range"
+          className="mt-1"
+        />
+      ) : null}
+      <div className="grid grid-cols-2 gap-1.5">
+        <Input
+          type="number"
+          placeholder={fromPh}
+          value={from ?? ""}
+          onChange={(e) => onCommit({ from: e.target.value === "" ? undefined : +e.target.value, to })}
+        />
+        <Input
+          type="number"
+          placeholder={toPh}
+          value={to ?? ""}
+          onChange={(e) => onCommit({ from, to: e.target.value === "" ? undefined : +e.target.value })}
+        />
+      </div>
     </div>
   );
 }
@@ -124,10 +159,11 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
         <Range
           from={f.priceFrom}
           to={f.priceTo}
-          onFrom={(v) => upd({ priceFrom: v })}
-          onTo={(v) => upd({ priceTo: v })}
+          onCommit={({ from, to }) => upd({ priceFrom: from, priceTo: to })}
           fromPh={t("filters.from")}
           toPh={t("filters.to")}
+          bounds={facets.ranges.price}
+          step={500}
         />
       </FilterGroup>
 
@@ -135,10 +171,11 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
         <Range
           from={f.yearFrom}
           to={f.yearTo}
-          onFrom={(v) => upd({ yearFrom: v })}
-          onTo={(v) => upd({ yearTo: v })}
+          onCommit={({ from, to }) => upd({ yearFrom: from, yearTo: to })}
           fromPh="2005"
           toPh="2025"
+          bounds={facets.ranges.year}
+          step={1}
         />
       </FilterGroup>
 
@@ -146,10 +183,11 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
         <Range
           from={f.mileageFrom}
           to={f.mileageTo}
-          onFrom={(v) => upd({ mileageFrom: v })}
-          onTo={(v) => upd({ mileageTo: v })}
+          onCommit={({ from, to }) => upd({ mileageFrom: from, mileageTo: to })}
           fromPh="0"
           toPh="300000"
+          bounds={facets.ranges.mileage}
+          step={1000}
         />
       </FilterGroup>
 
@@ -199,10 +237,11 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
         <Range
           from={f.engineFrom}
           to={f.engineTo}
-          onFrom={(v) => upd({ engineFrom: v })}
-          onTo={(v) => upd({ engineTo: v })}
+          onCommit={({ from, to }) => upd({ engineFrom: from, engineTo: to })}
           fromPh="1.0"
           toPh="5.0"
+          bounds={facets.ranges.engine}
+          step={0.1}
         />
       </FilterGroup>
 
@@ -210,10 +249,11 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
         <Range
           from={f.powerFrom}
           to={f.powerTo}
-          onFrom={(v) => upd({ powerFrom: v })}
-          onTo={(v) => upd({ powerTo: v })}
+          onCommit={({ from, to }) => upd({ powerFrom: from, powerTo: to })}
           fromPh="80"
           toPh="500"
+          bounds={facets.ranges.power}
+          step={5}
         />
       </FilterGroup>
 
@@ -260,6 +300,18 @@ function FiltersBody({ showHeader = true }: { showHeader?: boolean }) {
         <label htmlFor="filter-price-only" className="flex items-center gap-2 py-1 text-xs cursor-pointer">
           <Checkbox id="filter-price-only" checked={!!f.priceOnly} onCheckedChange={(v) => upd({ priceOnly: !!v })} />
           {t("filters.withPrice")}
+        </label>
+        <label htmlFor="filter-customs" className="flex items-center gap-2 py-1 text-xs cursor-pointer">
+          <Checkbox
+            id="filter-customs"
+            checked={!!f.customsCleared}
+            onCheckedChange={(v) => upd({ customsCleared: !!v })}
+          />
+          {t("filters.customsCleared")}
+        </label>
+        <label htmlFor="filter-bargain" className="flex items-center gap-2 py-1 text-xs cursor-pointer">
+          <Checkbox id="filter-bargain" checked={!!f.bargain} onCheckedChange={(v) => upd({ bargain: !!v })} />
+          {t("filters.bargain")}
         </label>
       </FilterGroup>
     </div>
@@ -357,5 +409,7 @@ function countActiveFilters(f: FilterState) {
   if (f.channel) n++;
   if (f.vinOnly) n++;
   if (f.priceOnly) n++;
+  if (f.bargain) n++;
+  if (f.customsCleared) n++;
   return n;
 }

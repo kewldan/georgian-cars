@@ -1,16 +1,24 @@
 import { cn } from "@/lib/utils";
 
 export function ListingCardSkeleton({ viewMode = "grid" }: { viewMode?: "grid" | "list" }) {
-  const isList = viewMode === "list";
+  if (viewMode === "list") {
+    return (
+      <div
+        aria-hidden
+        className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2.5 sm:px-3.5 sm:py-3"
+      >
+        <div className="h-14 w-20 shrink-0 animate-pulse rounded-sm bg-muted" />
+        <div className="flex flex-1 flex-col gap-1.5">
+          <div className="h-4 w-2/5 animate-pulse rounded bg-muted" />
+          <div className="h-3 w-3/4 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="h-5 w-20 animate-pulse rounded bg-muted" />
+      </div>
+    );
+  }
   return (
-    <div
-      aria-hidden
-      className={cn(
-        "flex overflow-hidden rounded-md border border-border bg-card",
-        isList ? "flex-row min-h-[160px]" : "flex-col"
-      )}
-    >
-      <div className={cn("animate-pulse bg-muted", isList ? "w-72 shrink-0" : "aspect-[16/10]")} />
+    <div aria-hidden className={cn("flex flex-col overflow-hidden rounded-md border border-border bg-card")}>
+      <div className="aspect-[16/10] animate-pulse bg-muted" />
       <div className="flex flex-1 flex-col gap-2 p-3.5">
         <div className="flex items-baseline justify-between gap-2">
           <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
