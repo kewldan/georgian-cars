@@ -12,7 +12,7 @@ import { fetcher } from "@/lib/api";
 import { FX, type Listing } from "@/lib/data";
 import { ratingLabel as getRatingLabel } from "@/lib/rating";
 import { useApp } from "@/lib/store";
-import { fmt } from "@/lib/utils";
+import { fmt, photoSrc } from "@/lib/utils";
 
 function CompareCol({ id, onRemove }: { id: string; onRemove: (id: string) => void }) {
   const t = useTranslations();
@@ -47,7 +47,7 @@ function CompareCol({ id, onRemove }: { id: string; onRemove: (id: string) => vo
     <div className="flex flex-col rounded-md border border-border bg-card">
       <div className="relative aspect-[16/10] overflow-hidden rounded-t-md bg-muted">
         <Image
-          src={data.photos[0]}
+          src={photoSrc(data.photos[0])}
           alt={`${data.make} ${data.model}`}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"

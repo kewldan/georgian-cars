@@ -29,7 +29,7 @@ import { FX } from "@/lib/data";
 import { ratingLabel as getRatingLabel, PRICE_BAR_GRADIENT, RATING_META } from "@/lib/rating";
 import { useApp } from "@/lib/store";
 import { useFavorites } from "@/lib/use-favorites";
-import { cn, fmt } from "@/lib/utils";
+import { cn, fmt, photoSrc } from "@/lib/utils";
 
 function Spec({ k, v }: { k: string; v: string | number }) {
   return (
@@ -101,24 +101,27 @@ export function DetailView({ listing }: { listing: Listing }) {
             <Carousel setApi={setApi} opts={{ loop: true }} plugins={[WheelGesturesPlugin()]} className="bg-muted">
               <CarouselContent className="ml-0">
                 <PhotoProvider>
-                  {listing.photos.map((p, i) => (
-                    <CarouselItem key={p} className="pl-0">
-                      <div className="relative aspect-2/1 sm:aspect-video">
-                        <PhotoView src={p}>
-                          <Image
-                            src={p}
-                            alt=""
-                            fill
-                            sizes="(min-width: 1024px) calc(100vw - 380px - 4rem), 100vw"
-                            priority={i === 0}
-                            loading={i === 0 ? undefined : "lazy"}
-                            draggable={false}
-                            className="object-cover select-none cursor-zoom-in"
-                          />
-                        </PhotoView>
-                      </div>
-                    </CarouselItem>
-                  ))}
+                  {listing.photos.map((p, i) => {
+                    const url = photoSrc(p);
+                    return (
+                      <CarouselItem key={p} className="pl-0">
+                        <div className="relative aspect-2/1 sm:aspect-video">
+                          <PhotoView src={url}>
+                            <Image
+                              src={url}
+                              alt=""
+                              fill
+                              sizes="(min-width: 1024px) calc(100vw - 380px - 4rem), 100vw"
+                              priority={i === 0}
+                              loading={i === 0 ? undefined : "lazy"}
+                              draggable={false}
+                              className="object-cover select-none cursor-zoom-in"
+                            />
+                          </PhotoView>
+                        </div>
+                      </CarouselItem>
+                    );
+                  })}
                 </PhotoProvider>
               </CarouselContent>
               <CarouselPrevious className="left-3" />
@@ -136,7 +139,7 @@ export function DetailView({ listing }: { listing: Listing }) {
                       i === photo ? "border-foreground" : "border-transparent"
                     )}
                   >
-                    <Image src={p} alt="" fill sizes="80px" className="object-cover" />
+                    <Image src={photoSrc(p)} alt="" fill sizes="80px" className="object-cover" />
                   </button>
                 ))}
               </div>

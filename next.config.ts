@@ -10,8 +10,12 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
     remotePatterns: [
-      // Real listing photos: replace with the host(s) the API returns.
       { protocol: "https", hostname: "**.basemaps.cartocdn.com" },
+      // Listing photos served by the backend at /api/images/<id>.webp.
+      // photoSrc() in lib/utils.ts prepends NEXT_PUBLIC_SITE_URL so next/image
+      // gets an absolute URL — these are the hosts the optimizer will fetch from.
+      { protocol: "https", hostname: "cars.kewldan.ru" },
+      { protocol: "http", hostname: "localhost" },
     ],
   },
   async rewrites() {

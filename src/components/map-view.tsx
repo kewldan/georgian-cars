@@ -11,7 +11,7 @@ import { useTheme } from "@/components/theme-provider";
 import { fetcher } from "@/lib/api";
 import { FX, type Listing } from "@/lib/data";
 import { useApp } from "@/lib/store";
-import { cn, fmt } from "@/lib/utils";
+import { cn, fmt, photoSrc } from "@/lib/utils";
 
 const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
@@ -153,7 +153,7 @@ export function MapView() {
                 className="flex gap-2.5 rounded-sm border border-border p-2 hover:bg-secondary"
               >
                 <div className="relative h-[42px] w-14 shrink-0 overflow-hidden rounded-sm">
-                  <Image src={l.photos[0]} alt="" fill sizes="56px" className="object-cover" />
+                  <Image src={photoSrc(l.photos[0])} alt="" fill sizes="56px" className="object-cover" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-xs font-bold">

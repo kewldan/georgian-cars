@@ -10,7 +10,7 @@ import { FX } from "@/lib/data";
 import { ratingLabel as getRatingLabel } from "@/lib/rating";
 import { COMPARE_LIMIT, useApp } from "@/lib/store";
 import { useFavorites } from "@/lib/use-favorites";
-import { cn, fmt } from "@/lib/utils";
+import { cn, fmt, photoSrc } from "@/lib/utils";
 
 function ago(d: number, h: number, t: ReturnType<typeof useTranslations>) {
   if (d > 0) return t("card.ago_d", { n: d });
@@ -102,7 +102,7 @@ function ListingGridCard({ listing, priority }: { listing: Listing; priority: bo
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         <Image
-          src={listing.photos[0]}
+          src={photoSrc(listing.photos[0])}
           alt={`${listing.make} ${listing.model}`}
           fill
           sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
@@ -179,7 +179,7 @@ function ListingRow({ listing, priority }: { listing: Listing; priority: boolean
     >
       <div className="relative h-14 w-20 overflow-hidden rounded-sm bg-muted shrink-0" style={{ gridArea: "thumb" }}>
         <Image
-          src={listing.photos[0]}
+          src={photoSrc(listing.photos[0])}
           alt=""
           fill
           sizes="80px"
