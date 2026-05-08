@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
       // gets an absolute URL — these are the hosts the optimizer will fetch from.
       { protocol: "https", hostname: "cars.kewldan.ru" },
       { protocol: "http", hostname: "localhost" },
+      // Locale flag glyphs in TopBar — tiny PNG icons rendered through next/image
+      // with `unoptimized` (skips /_next/image), but listed here in case the
+      // optimizer is later turned back on for them.
+      { protocol: "https", hostname: "emojicdn.elk.sh" },
     ],
   },
   async rewrites() {
