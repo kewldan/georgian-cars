@@ -68,7 +68,7 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
           <span className="font-mono text-[13px] font-semibold text-muted-foreground shrink-0">{listing.year}</span>
         </div>
         <div className="font-mono text-xs text-muted-foreground">
-          {fmt.km(listing.mileage)} {t("card.km")}
+          {fmt.km(listing.mileage)}&nbsp;{t("card.km")}
           <span className="mx-2 text-foreground/30">·</span>
           {listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}
           <span className="mx-2 text-foreground/30">·</span>
