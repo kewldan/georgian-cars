@@ -72,7 +72,7 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
           <span className="mx-2 text-foreground/30">·</span>
           {listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}
           <span className="mx-2 text-foreground/30">·</span>
-          {listing.power} {t("card.hp")}
+          {listing.power}&nbsp;{t("card.hp")}
           <span className={cn("mx-2 text-foreground/30", isList && "hidden sm:inline")}>·</span>
           <span className={cn(isList && "hidden sm:inline")}>{listing.transmission.slice(0, 4)}</span>
           <span className={cn("mx-2 text-foreground/30", isList && "hidden sm:inline")}>·</span>
