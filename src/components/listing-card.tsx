@@ -18,6 +18,28 @@ function ago(d: number, h: number, t: ReturnType<typeof useTranslations>) {
   return t("card.ago_now");
 }
 
+// Renders a row of spec chips separated by `·`. Each chip is whitespace-nowrap
+// so a long value never breaks mid-word, and the `·` is glued to the chip in
+// front of it so a separator never lands at the start of a wrapped line.
+function CardSpecs({ items, className }: { items: React.ReactNode[]; className?: string }) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 font-mono text-xs text-muted-foreground",
+        className
+      )}
+    >
+      {items.map((it, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: positional spec list, stable per render
+        <span key={i} className="inline-flex items-baseline whitespace-nowrap">
+          {i > 0 ? <span className="mr-1.5 text-foreground/30">·</span> : null}
+          {it}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function ListingCard({
   listing,
   viewMode = "grid",
@@ -131,17 +153,15 @@ function ListingGridCard({ listing, priority }: { listing: Listing; priority: bo
           </span>
           <span className="font-mono text-[13px] font-semibold text-muted-foreground shrink-0">{listing.year}</span>
         </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          {fmt.km(listing.mileage)}&nbsp;{t("card.km")}
-          <span className="mx-2 text-foreground/30">·</span>
-          {listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}
-          <span className="mx-2 text-foreground/30">·</span>
-          {listing.power}&nbsp;{t("card.hp")}
-          <span className="mx-2 text-foreground/30">·</span>
-          <span>{listing.transmission.slice(0, 4)}</span>
-          <span className="mx-2 text-foreground/30">·</span>
-          <span>{listing.drive}</span>
-        </div>
+        <CardSpecs
+          items={[
+            `${fmt.km(listing.mileage)} ${t("card.km")}`,
+            listing.fuel === "Electric" ? "EV" : `${listing.engine}L`,
+            `${listing.power} ${t("card.hp")}`,
+            listing.transmission.slice(0, 4),
+            listing.drive,
+          ]}
+        />
         <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
           <span className="inline-flex min-w-0 items-center gap-1 font-semibold text-foreground/80">
             <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{listing.city}</span>
@@ -209,28 +229,21 @@ function ListingRow({ listing, priority }: { listing: Listing; priority: boolean
             </Badge>
           ) : null}
         </div>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-muted-foreground">
-          <span>
-            {fmt.km(listing.mileage)} {t("card.km")}
-          </span>
-          <span className="text-foreground/30">·</span>
-          <span>{listing.fuel === "Electric" ? "EV" : `${listing.engine}L`}</span>
-          <span className="text-foreground/30">·</span>
-          <span>
-            {listing.power} {t("card.hp")}
-          </span>
-          <span className="text-foreground/30">·</span>
-          <span>{listing.transmission.slice(0, 4)}</span>
-          <span className="text-foreground/30">·</span>
-          <span>{listing.drive}</span>
-          <span className="text-foreground/30">·</span>
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {listing.city}
-          </span>
-          <span className="text-foreground/30">·</span>
-          <span>{ago(listing.postedDays, listing.postedHours, t)}</span>
-        </div>
+        <CardSpecs
+          className="mt-0.5 text-[11px]"
+          items={[
+            `${fmt.km(listing.mileage)} ${t("card.km")}`,
+            listing.fuel === "Electric" ? "EV" : `${listing.engine}L`,
+            `${listing.power} ${t("card.hp")}`,
+            listing.transmission.slice(0, 4),
+            listing.drive,
+            <span key="city" className="inline-flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {listing.city}
+            </span>,
+            ago(listing.postedDays, listing.postedHours, t),
+          ]}
+        />
       </div>
 
       <span

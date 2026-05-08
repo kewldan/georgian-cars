@@ -6,7 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const numberFmt = new Intl.NumberFormat("en-US", { useGrouping: true, maximumFractionDigits: 0 });
-const groupedSpace = (n: number) => numberFmt.format(n).replace(/,/g, " ");
+// Replace commas with NBSP ( ) so grouped numbers ("150 000") stay atomic
+// and don't wrap mid-number inside cards / price tags.
+const groupedSpace = (n: number) => numberFmt.format(n).replace(/,/g, " ");
 
 const CURRENCY_SYMBOL = { USD: "$", RUB: "₽", GEL: "₾" } as const;
 type CurrencyCode = keyof typeof CURRENCY_SYMBOL;
@@ -16,7 +18,8 @@ export const fmt = {
     const v = Math.round(usd * (fxRates[currency] || 1));
     const sym = CURRENCY_SYMBOL[currency] ?? "$";
     const formatted = groupedSpace(v);
-    return currency === "USD" ? `${sym}${formatted}` : `${formatted} ${sym}`;
+    // NBSP between number and symbol so "150 000 ₾" never breaks before ₾.
+    return currency === "USD" ? `${sym}${formatted}` : `${formatted} ${sym}`;
   },
   km(n: number) {
     return groupedSpace(n);
