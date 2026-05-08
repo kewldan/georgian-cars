@@ -120,7 +120,7 @@ function ListingGridCard({ listing, priority }: { listing: Listing; priority: bo
   return (
     <Link
       href={`/listing/${listing.id}`}
-      className="group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-foreground/40"
+      className="group flex h-full flex-col overflow-hidden rounded-md border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-foreground/40"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         <Image

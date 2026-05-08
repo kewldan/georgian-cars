@@ -23,7 +23,7 @@ export function RecentStrip({ excludeId }: { excludeId?: string }) {
   const filtered = ids.filter((id) => id !== excludeId).slice(0, PAGE_SIZE);
   if (filtered.length === 0) return null;
   return (
-    <section aria-label={t("recent.title")} className="mt-6">
+    <section aria-label={t("recent.title")} className="mt-6 mb-8">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t("recent.title")}</h3>
         <button
