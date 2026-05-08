@@ -1,5 +1,6 @@
 "use client";
 import { X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useListingsParams } from "@/lib/listings-params";
 import type { FilterState } from "@/lib/store";
@@ -90,31 +91,47 @@ export function ActiveFilters() {
     });
   }
 
-  if (pills.length === 0) return null;
-
   return (
-    <div className="mb-3 flex flex-wrap items-center gap-1.5">
-      {pills.map((p) => (
-        <button
-          key={p.key}
-          type="button"
-          onClick={p.clear}
-          aria-label={t("listings.removeFilter")}
-          className="group inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-semibold text-foreground/80 transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+    <AnimatePresence initial={false}>
+      {pills.length > 0 ? (
+        <motion.div
+          key="pills-row"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="mb-3 flex flex-wrap items-center gap-1.5 overflow-hidden"
         >
-          <span>{p.label}</span>
-          <X className="h-3 w-3 opacity-60 transition-opacity group-hover:opacity-100" />
-        </button>
-      ))}
-      {pills.length > 1 ? (
-        <button
-          type="button"
-          onClick={clearAll}
-          className="ml-1 text-[11px] font-semibold text-muted-foreground underline underline-offset-[3px] hover:text-foreground"
-        >
-          {t("search.clearAll")}
-        </button>
+          <AnimatePresence initial={false}>
+            {pills.map((p) => (
+              <motion.button
+                key={p.key}
+                layout
+                initial={{ opacity: 0, scale: 0.85, x: -6 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.85 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+                type="button"
+                onClick={p.clear}
+                aria-label={t("listings.removeFilter")}
+                className="group inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-semibold text-foreground/80 transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+              >
+                <span>{p.label}</span>
+                <X className="h-3 w-3 opacity-60 transition-opacity group-hover:opacity-100" />
+              </motion.button>
+            ))}
+          </AnimatePresence>
+          {pills.length > 1 ? (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="ml-1 text-[11px] font-semibold text-muted-foreground underline underline-offset-[3px] hover:text-foreground"
+            >
+              {t("search.clearAll")}
+            </button>
+          ) : null}
+        </motion.div>
       ) : null}
-    </div>
+    </AnimatePresence>
   );
 }

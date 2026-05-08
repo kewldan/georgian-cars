@@ -1,5 +1,6 @@
 "use client";
 import { Grid, List as ListIcon, Search } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
@@ -26,8 +27,19 @@ export function ListingsToolbar({ count }: { count: number }) {
   return (
     <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3.5">
       <div className="flex items-baseline gap-2">
-        <span className="font-mono text-lg sm:text-[22px] font-extrabold tracking-tight tabular-nums">
-          {count.toLocaleString()}
+        <span className="relative inline-block font-mono text-lg sm:text-[22px] font-extrabold tracking-tight tabular-nums">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.span
+              key={count}
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -12, opacity: 0 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="inline-block"
+            >
+              {count.toLocaleString()}
+            </motion.span>
+          </AnimatePresence>
         </span>
         <span className="text-xs sm:text-[13px] text-muted-foreground">{t("search.results")}</span>
       </div>

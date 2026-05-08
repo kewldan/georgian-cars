@@ -1,7 +1,8 @@
 "use client";
 import { Search } from "lucide-react";
+import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 import { ActiveFilters } from "@/components/active-filters";
 import { FiltersPanel } from "@/components/filters-panel";
@@ -42,6 +43,19 @@ export function ListingsPage() {
     fetcher,
     { keepPreviousData: true, revalidateFirstPage: false }
   );
+
+  // Stagger only the cards that are new since the last filter/search/sort change.
+  // Pre-existing cards skip the entrance animation so infinite-scroll appends don't re-fire it.
+  const querySig = useMemo(() => JSON.stringify([filters, search, sort]), [filters, search, sort]);
+  const animatedRef = useRef<{ sig: string; ids: Set<string> }>({ sig: querySig, ids: new Set() });
+  if (animatedRef.current.sig !== querySig) {
+    animatedRef.current = { sig: querySig, ids: new Set() };
+  }
+  const shouldAnimate = (id: string) => {
+    if (animatedRef.current.ids.has(id)) return false;
+    animatedRef.current.ids.add(id);
+    return true;
+  };
 
   const pages = data ?? [];
   const items = pages.flatMap((p) => p.items);
@@ -97,9 +111,19 @@ export function ListingsPage() {
               className={cn("grid gap-3.5", viewMode === "list" && "grid-cols-1")}
               style={viewMode === "grid" ? { gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" } : undefined}
             >
-              {items.map((l, i) => (
-                <ListingCard key={l.id} listing={l} viewMode={viewMode} priority={i < 4} />
-              ))}
+              {items.map((l, i) => {
+                const animate = shouldAnimate(l.id);
+                return (
+                  <motion.div
+                    key={l.id}
+                    initial={animate ? { opacity: 0, y: 8 } : false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut", delay: animate ? Math.min(i, 11) * 0.018 : 0 }}
+                  >
+                    <ListingCard listing={l} viewMode={viewMode} priority={i < 4} />
+                  </motion.div>
+                );
+              })}
               {isLoadingMore
                 ? Array.from({ length: Math.min(pageSize, 8) }, (_, i) => (
                     <ListingCardSkeleton

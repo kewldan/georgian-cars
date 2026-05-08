@@ -1,5 +1,6 @@
 "use client";
 import { GitCompare, Heart, ImageIcon, MapPin } from "lucide-react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -32,21 +33,30 @@ export function ListingCard({
 
 function FavButton({ id, fav, onToggle }: { id: string; fav: boolean; onToggle: (id: string) => void }) {
   return (
-    <button
+    <motion.button
       type="button"
       onClick={(e) => {
         e.preventDefault();
         onToggle(id);
       }}
+      whileTap={{ scale: 0.85 }}
       className={cn(
-        "grid h-7 w-7 place-items-center rounded-full border backdrop-blur",
+        "grid h-7 w-7 place-items-center rounded-full border backdrop-blur transition-colors",
         fav ? "bg-accent text-accent-foreground border-accent" : "bg-white/90 text-neutral-900 border-black/5"
       )}
       aria-label="favorite"
       aria-pressed={fav}
     >
-      <Heart className={cn("h-3.5 w-3.5", fav && "fill-current")} />
-    </button>
+      <motion.span
+        key={fav ? "on" : "off"}
+        initial={{ scale: fav ? 0.6 : 1 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 600, damping: 14 }}
+        className="grid place-items-center"
+      >
+        <Heart className={cn("h-3.5 w-3.5", fav && "fill-current")} />
+      </motion.span>
+    </motion.button>
   );
 }
 
@@ -57,13 +67,14 @@ function CompareToggle({ id }: { id: string }) {
   const on = compare.includes(id);
   const disabled = !on && compare.length >= COMPARE_LIMIT;
   return (
-    <button
+    <motion.button
       type="button"
       onClick={(e) => {
         e.preventDefault();
         if (!disabled) toggleCompare(id);
       }}
       disabled={disabled}
+      whileTap={disabled ? undefined : { scale: 0.85 }}
       aria-label={on ? t("listings.removeFromCompare") : t("listings.addToCompare")}
       aria-pressed={on}
       title={on ? t("listings.removeFromCompare") : t("listings.addToCompare")}
@@ -73,7 +84,7 @@ function CompareToggle({ id }: { id: string }) {
       )}
     >
       <GitCompare className="h-3.5 w-3.5" />
-    </button>
+    </motion.button>
   );
 }
 
@@ -87,7 +98,7 @@ function ListingGridCard({ listing, priority }: { listing: Listing; priority: bo
   return (
     <Link
       href={`/listing/${listing.id}`}
-      className="group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-all hover:shadow-md hover:border-foreground/40"
+      className="group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-foreground/40"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         <Image
@@ -97,7 +108,7 @@ function ListingGridCard({ listing, priority }: { listing: Listing; priority: bo
           sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
           priority={priority}
           loading={priority ? undefined : "lazy"}
-          className="object-cover"
+          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
         />
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
           <Badge variant={listing.priceRating}>{ratingLabel}</Badge>
