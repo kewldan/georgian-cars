@@ -13,6 +13,7 @@ import {
   Sun,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -34,14 +35,14 @@ const LOCALE_OPTIONS: Array<{ code: Locale; flag: string; label: string }> = [
 
 function Flag({ emoji, className }: { emoji: string; className?: string }) {
   return (
-    // biome-ignore lint/performance/noImgElement: tiny third-party CDN icon, native flag glyphs render poorly on Windows Chrome
-    <img
+    <Image
       src={`https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=apple`}
       alt=""
       aria-hidden="true"
+      width={36}
+      height={36}
+      unoptimized
       className={className}
-      loading="lazy"
-      decoding="async"
     />
   );
 }
