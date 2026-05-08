@@ -1,6 +1,7 @@
 "use client";
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { Heart, MessageSquare, Phone, Send } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -100,10 +101,16 @@ export function DetailView({ listing }: { listing: Listing }) {
                 <PhotoProvider>
                   {listing.photos.map((p) => (
                     <CarouselItem key={p} className="pl-0">
-                      <div className="aspect-2/1 sm:aspect-video">
+                      <div className="relative aspect-2/1 sm:aspect-video">
                         <PhotoView src={p}>
-                          {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
-                          <img src={p} alt="" draggable={false} className="h-full w-full object-cover select-none" />
+                          <Image
+                            src={p}
+                            alt=""
+                            fill
+                            sizes="(min-width: 1024px) calc(100vw - 380px - 4rem), 100vw"
+                            draggable={false}
+                            className="object-cover select-none"
+                          />
                         </PhotoView>
                       </div>
                     </CarouselItem>
@@ -121,12 +128,11 @@ export function DetailView({ listing }: { listing: Listing }) {
                     type="button"
                     onClick={() => api?.scrollTo(i)}
                     className={cn(
-                      "h-12 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-[60px] sm:w-20",
+                      "relative h-12 w-16 shrink-0 overflow-hidden rounded-sm border-2 sm:h-[60px] sm:w-20",
                       i === photo ? "border-foreground" : "border-transparent"
                     )}
                   >
-                    {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
-                    <img src={p} alt="" className="h-full w-full object-cover" />
+                    <Image src={p} alt="" fill sizes="80px" className="object-cover" />
                   </button>
                 ))}
               </div>

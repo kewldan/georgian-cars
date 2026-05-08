@@ -2,6 +2,7 @@
 import type { DivIcon } from "leaflet";
 import { ChevronRight } from "lucide-react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -146,8 +147,9 @@ export function MapView() {
                 href={`/listing/${l.id}`}
                 className="flex gap-2.5 rounded-sm border border-border p-2 hover:bg-secondary"
               >
-                {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
-                <img src={l.photos[0]} alt="" className="h-[42px] w-14 rounded-sm object-cover" />
+                <div className="relative h-[42px] w-14 shrink-0 overflow-hidden rounded-sm">
+                  <Image src={l.photos[0]} alt="" fill sizes="56px" className="object-cover" />
+                </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-xs font-bold">
                     {l.make} {l.model}

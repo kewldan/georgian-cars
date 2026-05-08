@@ -1,5 +1,6 @@
 "use client";
 import { Heart, ImageIcon, MapPin } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
@@ -34,8 +35,15 @@ export function ListingCard({ listing, viewMode = "grid" }: { listing: Listing; 
       )}
     >
       <div className={cn("relative overflow-hidden bg-muted", isList ? "w-28 shrink-0 sm:w-72" : "aspect-[16/10]")}>
-        {/* biome-ignore lint/performance/noImgElement: photos are inline SVG data URIs */}
-        <img src={listing.photos[0]} alt={`${listing.make} ${listing.model}`} className="h-full w-full object-cover" />
+        <Image
+          src={listing.photos[0]}
+          alt={`${listing.make} ${listing.model}`}
+          fill
+          sizes={
+            isList ? "(min-width: 640px) 288px, 112px" : "(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
+          }
+          className="object-cover"
+        />
         <div className={cn("absolute left-2 top-2 flex flex-wrap gap-1", isList && "hidden sm:flex")}>
           <Badge variant={listing.priceRating}>{ratingLabel}</Badge>
           {listing.vinChecked && <Badge variant="default">VIN ✓</Badge>}
