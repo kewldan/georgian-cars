@@ -1,63 +1,91 @@
-# GeorgianCars — Next.js + Tailwind + shadcn/ui
+# 🚘 GeorgianCars
 
-Marketplace для объявлений из Telegram-каналов Грузии. Объявления нормализуются ИИ к единому типу.
+**Авто из Telegram-каналов Грузии** — витрина объявлений о продаже автомобилей, собранных из Telegram-каналов и приведённых к единому формату: фильтры, карта, избранное, сравнение и оценка справедливости цены.
 
-## Стек
-- **Next.js 15** (App Router, React 19)
-- **Tailwind CSS** + **shadcn/ui** (Button, Badge, Input, Select, Checkbox, ToggleGroup, Card)
-- **next-intl** для i18n (RU / EN / KA), переключение через cookie + Server Action
-- **next-themes** для light/dark
-- **Zustand** + persist для фильтров, сортировки, избранного, валюты, темы
-- **react-leaflet** + OpenStreetMap для карты (компонент в духе [shadcn-map](https://shadcn-map.vercel.app/))
-- **lucide-react** для иконок
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000?style=flat&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![next-intl](https://img.shields.io/badge/next--intl-4-5FC3E7?style=flat)](https://next-intl.dev)
 
-## Структура
-```
-src/
-  app/
-    layout.tsx           # NextIntl + Theme + TopBar
-    page.tsx             # / — главная (фильтры + сетка)
-    listing/[id]/page.tsx
-    favorites/page.tsx
-    saved/page.tsx
-    map/page.tsx
-    actions.ts           # Server Action setLocale (cookie)
-    globals.css          # shadcn CSS-vars + 4 палитры
-  components/
-    top-bar.tsx
-    filters-panel.tsx
-    listing-card.tsx
-    listings-page.tsx
-    listings-toolbar.tsx
-    detail-view.tsx
-    map-view.tsx
-    theme-provider.tsx
-    ui/                  # shadcn primitives
-  i18n/request.ts        # next-intl config
-  lib/
-    data.ts              # моки Listing[]
-    store.ts             # zustand
-    utils.ts             # cn(), fmt
-    filter-listings.ts   # apply filters + sort
-messages/{ru,en,ka}.json
-```
+Это фронтенд — тонкий клиент над FastAPI-бэкендом из соседнего репозитория: **https://github.com/kewldan/cars-backend**. Все данные приходят по `/api` (в dev — rewrite на `http://localhost:8080`, в проде — nginx → контейнер `cars-api`).
 
-## Запуск
+## ✨ Возможности
+
+- 🔎 **Поиск и фильтры с состоянием в URL** — цена, год, пробег, марка/модель, топливо, коробка, город и др.; любой набор фильтров шарится обычной ссылкой
+- ♾️ **Бесконечная лента** — `useSWRInfinite`, 24 объявления на страницу, догрузка по `IntersectionObserver`
+- 🏷 **Оценка цены** — шкала great / good / fair / high / overpriced на карточке и в деталях, бейдж проверенного VIN
+- ❤️ **Избранное без регистрации** — хранится на сервере, устройство идентифицируется заголовком `X-Device-Id` (UUID в `localStorage`)
+- 🔖 **Сохранённые поиски** — именованные наборы фильтров с флагом уведомлений (`/saved-searches` на бэкенде)
+- 🆚 **Сравнение объявлений** — плавающая панель сравнения (zustand)
+- 🗺 **Карта объявлений** — react-leaflet + OpenStreetMap
+- 🕘 **Недавно просмотренные** — локальная история (localStorage `gc_recent`)
+- 🌐 **Три языка**: русский / английский / грузинский (next-intl, cookie `NEXT_LOCALE`, переключение через Server Action)
+- 🎨 **4 цветовые палитры** (`electric` / `sunset` / `azure` / `tbilisi`) + тёмная тема без вспышки при загрузке
+- 💱 **Цены в USD / RUB / GEL** — переключатель валюты
+- 🖼 **OG-изображения** генерируются на лету для каждой страницы (`opengraph-image.tsx`), PWA-manifest
+- 📸 **Фотогалереи** — embla-карусель + полноэкранный просмотр (react-photo-view)
+
+## 🧰 Стек
+
+- **Next.js 16** — App Router, RSC, React Compiler; **React 19**; **TypeScript** (strict)
+- **Tailwind CSS 4** + Radix UI-примитивы + **motion** (анимации) + **lucide-react** (иконки)
+- **SWR** (данные, infinite scroll, optimistic-мутации избранного) + **zustand** (локальные предпочтения: валюта, палитра, вид)
+- **next-intl** — i18n (ru / en / ka)
+- **react-leaflet** — карта; **sharp** — оптимизация изображений
+- **Biome** — линт и формат; **Bun** — пакетный менеджер (`bun.lock`)
+
+## 🚀 Быстрый старт
+
 ```bash
-pnpm install   # или npm/yarn
-pnpm dev
+bun install
+
+# поднимите бэкенд (cars-backend) на http://localhost:8080 —
+# next.config.ts проксирует /api/* туда автоматически
+bun dev
 ```
 
-## Что внутри
-- Главная: 14 фильтров (цена, год, пробег, литраж, мощность, марка, модель, топливо, коробка, привод, кузов, город, цвет, TG-канал, VIN-only, цена-only), 7 сортировок, поиск, плотность, grid/list.
-- Карточка: бейджи цены (great/good/fair/high/overpriced), VIN ✓, NEW, лайк.
-- Детали: галерея, AI-саммари с индикатором справедливости цены, спеки, опции, оригинальный пост, sticky-сайдбар с большой кнопкой «Открыть в Telegram».
-- Избранное (zustand persist).
-- Сохранённые поиски с уведомлениями в Telegram (моки).
-- Карта: реальный leaflet с пинами по городам Грузии и панелью объявлений выбранного города.
-- 4 палитры через `data-palette` (electric / sunset / azure / tbilisi), light/dark через `next-themes`.
+Приложение: http://localhost:3000. Продакшен-сборка:
 
-## TODO
-- API-роут для подгрузки объявлений из Telegram-канала (Bot API / MTProto).
-- ИИ-нормализация (OpenAI structured output) → единая схема `Listing`.
-- Уведомления о сохранённых поисках через Telegram-бота.
+```bash
+bun run build
+bun run start        # next start -p 80
+```
+
+### Переменные окружения
+
+| Переменная | Назначение |
+|---|---|
+| `NEXT_PUBLIC_API_BASE` | База API для браузера (по умолчанию `/api`; можно указать абсолютный адрес бэкенда напрямую) |
+| `API_URL` | База API для серверного кода (RSC, `generateMetadata`, OG-изображения); приоритетнее `NEXT_PUBLIC_API_BASE`, fallback — `http://localhost:8080` |
+| `NEXT_PUBLIC_SITE_URL` | Публичный URL сайта — `metadataBase` и абсолютные URL фотографий для `next/image` |
+
+### Скрипты
+
+```bash
+bun dev              # dev-сервер
+bun run build        # production build
+bun run lint         # biome check
+bun run lint:fix     # biome check --write
+bun run format       # biome format --write
+```
+
+### Docker
+
+`docker-compose.yml` поднимает `web` (этот фронтенд) и `proxy` (nginx, конфиг в `conf.d/`): браузер ходит на same-origin `/api/...`, nginx маршрутизирует эти запросы в контейнер бэкенда `cars-api`, остальное — в `web`. Серверный код фронтенда ходит в API через тот же nginx (`API_URL=http://proxy/api`), чтобы правила совпадали в обоих контекстах. Снаружи трафик заводится через Traefik-лейблы.
+
+```bash
+docker compose up -d --build
+```
+
+## 🗺 Маршруты
+
+| Путь | Описание |
+|---|---|
+| `/` | Лента объявлений: поиск, фильтры, сортировка |
+| `/listing/[id]` | Карточка объявления: галерея, спеки, оценка цены, ссылка на пост |
+| `/favorites` | Избранное |
+| `/saved` | Сохранённые поиски |
+| `/compare` | Сравнение выбранных объявлений |
+| `/map` | Карта объявлений |
+| `/channel/[id]` | Редирект на ленту с фильтром по Telegram-каналу |
